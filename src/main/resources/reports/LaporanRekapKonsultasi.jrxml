@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LaporanRekapKonsultasi" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e05b7661-8cf3-40a0-ba12-f19b5e5a2862">
+	<parameter name="paramKelas" class="java.lang.String"/>
+	<parameter name="paramStatus" class="java.lang.String"/>
+	<parameter name="paramTahun" class="java.lang.String"/>
+	<parameter name="paramSemester" class="java.lang.String"/>
+	<parameter name="paramStartDate" class="java.sql.Timestamp"/>
+	<parameter name="paramEndDate" class="java.sql.Timestamp"/>
+	<queryString language="SQL">
+		<![CDATA[
+        SELECT k.no_konsultasi, s.nama as nama_siswa, s.kelas, j.nama as jurusan, c.nama as konselor, k.tanggal_konsultasi, k.status
+        FROM konsultasi k
+        JOIN siswa s ON k.siswa_id = s.id
+        JOIN konselor c ON k.konselor_id = c.id
+        LEFT JOIN jurusan_kuliah j ON k.rekomendasi_utama_id = j.id
+        WHERE 
+          ($P{paramKelas} = 'Semua Kelas' OR s.kelas = $P{paramKelas}) AND
+          ($P{paramStatus} = 'Semua Status' OR k.status = REPLACE(LOWER($P{paramStatus}), ' ', '_')) AND
+          ($P{paramTahun} = 'Semua Tahun' OR s.tahun_ajaran = $P{paramTahun}) AND
+          ($P{paramSemester} = 'Semua Semester' OR s.semester = $P{paramSemester}) AND
+          k.tanggal_konsultasi BETWEEN $P{paramStartDate} AND $P{paramEndDate}
+        ORDER BY k.tanggal_konsultasi DESC
+        ]]>
+	</queryString>
+	<field name="no_konsultasi" class="java.lang.String"/>
+	<field name="nama_siswa" class="java.lang.String"/>
+	<field name="kelas" class="java.lang.String"/>
+	<field name="jurusan" class="java.lang.String"/>
+	<field name="konselor" class="java.lang.String"/>
+	<field name="tanggal_konsultasi" class="java.sql.Timestamp"/>
+	<field name="status" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="100" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="800" height="30" uuid="7a4f91b5-31f4-4df8-8686-21f45610b77a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="20" isBold="true"/>
+				</textElement>
+				<text><![CDATA[SMA NEGERI 1 CONTOH KOTA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="30" width="800" height="20" uuid="e0a3e9cd-99ef-4364-83e9-74d6e90db724"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Jalan Pendidikan No. 123, Telp. (021) 555-1234]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="60" width="800" height="1" uuid="8de5dbaf-9d0b-4f7b-91bb-0b7c02b28cf9"/>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="70" width="800" height="20" uuid="3fb80dbb-d8ed-4b2a-8742-dc86a3451554"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[LAPORAN REKAPITULASI KONSULTASI SISWA]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="50" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="200" height="15" uuid="5781a7fc-41b2-4d0f-96eb-8e5ba41f92c3"/>
+				<textFieldExpression><![CDATA["Tahun Ajaran: " + $P{paramTahun}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="15" width="200" height="15" uuid="c24a54c6-e78a-4d4f-b649-74895c1c87db"/>
+				<textFieldExpression><![CDATA["Semester: " + $P{paramSemester}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="500" y="0" width="300" height="15" uuid="2a58b884-3c66-4e58-9cf2-df8b75f81881"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Dicetak pada: " + new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="30" uuid="bc22e960-9d02-474c-baeb-cd032488a032"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No Konsultasi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="0" width="150" height="30" uuid="7779f324-4f0e-43be-ba0b-d2483861298c"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nama Siswa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="250" y="0" width="80" height="30" uuid="7cf446e0-888e-4a64-94fc-75ff95eb4884"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Kelas]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="330" y="0" width="170" height="30" uuid="197621f3-d020-410a-8d1d-04b32a76f23f"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Rekomendasi Jurusan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="500" y="0" width="130" height="30" uuid="f2910d54-aeb2-4114-bad5-2b4afc33ff50"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Konselor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="630" y="0" width="100" height="30" uuid="8db5d03b-c2e3-469d-8c43-8fbaef8e535a"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="730" y="0" width="72" height="30" uuid="dd9919f9-eeb5-407b-a3ba-67cfbe3028d1"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Status]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="100" height="20" uuid="6cde5e92-f04b-4df2-a396-7c05b822bb97"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{no_konsultasi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="0" width="150" height="20" uuid="a7f83fb0-6bb1-419b-a3b0-681b9e83ecbc"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama_siswa}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="250" y="0" width="80" height="20" uuid="ea60b868-b788-4f81-9b69-808fc59b40f2"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{kelas}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="330" y="0" width="170" height="20" uuid="b5a8e0cb-d434-453d-8884-29759c55b6ef"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{jurusan}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="500" y="0" width="130" height="20" uuid="bdc4bdf4-f5eb-4a00-abda-41cfb23c21a4"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{konselor}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="630" y="0" width="100" height="20" uuid="7ceb10c5-e51c-4235-af39-8692f03fbfdb"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{tanggal_konsultasi})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="730" y="0" width="72" height="20" uuid="b4b57682-1775-4b0d-b2a7-54848d7c2a74"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{status}.toUpperCase()]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<textField>
+				<reportElement x="350" y="20" width="100" height="30" uuid="40a7cf30-a9cb-4c57-ae86-069dfb6f2081"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Halaman " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

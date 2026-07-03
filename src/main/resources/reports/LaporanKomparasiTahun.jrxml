@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LaporanKomparasiTahun" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e05b7661-8cf3-40a0-ba12-f19b5e5a2862">
+	<parameter name="paramTahun1" class="java.lang.String"/>
+	<parameter name="paramTahun2" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[
+        SELECT s.tahun_ajaran, j.nama as jurusan, COUNT(k.id) as total_peminat
+        FROM konsultasi k
+        JOIN siswa s ON k.siswa_id = s.id
+        JOIN jurusan_kuliah j ON k.rekomendasi_utama_id = j.id
+        WHERE s.tahun_ajaran IN ($P{paramTahun1}, $P{paramTahun2})
+        GROUP BY s.tahun_ajaran, j.nama
+        ORDER BY j.nama ASC, s.tahun_ajaran ASC
+        ]]>
+	</queryString>
+	<field name="tahun_ajaran" class="java.lang.String"/>
+	<field name="jurusan" class="java.lang.String"/>
+	<field name="total_peminat" class="java.lang.Long"/>
+	<group name="GroupJurusan">
+		<groupExpression><![CDATA[$F{jurusan}]]></groupExpression>
+		<groupHeader>
+			<band height="30">
+				<textField>
+					<reportElement x="0" y="0" width="555" height="30" uuid="20000000-0000-0000-0000-000000000001"/>
+					<box>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+						<paragraph leftIndent="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Jurusan: " + $F{jurusan}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<title>
+		<band height="100" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="30" uuid="7a4f91b5-31f4-4df8-8686-21f45610b77a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[LAPORAN KOMPARASI PEMINATAN JURUSAN]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="30" width="555" height="20" uuid="e0a3e9cd-99ef-4364-83e9-74d6e90db724"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Perbandingan Tahun Ajaran: " + $P{paramTahun1} + " vs " + $P{paramTahun2}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="60" width="555" height="1" uuid="8de5dbaf-9d0b-4f7b-91bb-0b7c02b28cf9"/>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</line>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="355" height="30" uuid="7779f324-4f0e-43be-ba0b-d2483861298c"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tahun Ajaran]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="355" y="0" width="200" height="30" uuid="7cf446e0-888e-4a64-94fc-75ff95eb4884"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Rekomendasi / Peminat]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="355" height="20" uuid="ea60b868-b788-4f81-9b69-808fc59b40f2"/>
+				<box>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{tahun_ajaran}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="355" y="0" width="200" height="20" uuid="b5a8e0cb-d434-453d-8884-29759c55b6ef"/>
+				<box>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{total_peminat}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

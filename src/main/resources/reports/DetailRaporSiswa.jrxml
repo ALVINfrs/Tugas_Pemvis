@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailRaporSiswa" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20" whenNoDataType="AllSectionsNoDetail">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+
+	<!-- ═══════════════════ SUB-DATASET PTN ═══════════════════ -->
+	<subDataset name="DatasetPTN">
+		<parameter name="pKonsultasiId" class="java.lang.Integer"/>
+		<parameter name="pRank" class="java.lang.Integer"/>
+		<queryString language="SQL">
+			<![CDATA[
+			SELECT u.nama as universitas, u.provinsi, u.akreditasi, uj.passing_grade_snbp, uj.passing_grade_snbt, uj.biaya_kuliah, ru.peluang_personal 
+			FROM rekomendasi_univ ru 
+			JOIN universitas_jurusan uj ON ru.universitas_jurusan_id = uj.id 
+			JOIN universitas u ON uj.universitas_id = u.id 
+			WHERE ru.konsultasi_id = $P{pKonsultasiId} AND ru.rank_urutan = $P{pRank}
+			]]>
+		</queryString>
+		<field name="universitas" class="java.lang.String"/>
+		<field name="provinsi" class="java.lang.String"/>
+		<field name="akreditasi" class="java.lang.String"/>
+		<field name="passing_grade_snbp" class="java.math.BigDecimal"/>
+		<field name="passing_grade_snbt" class="java.math.BigDecimal"/>
+		<field name="biaya_kuliah" class="java.lang.Long"/>
+		<field name="peluang_personal" class="java.math.BigDecimal"/>
+	</subDataset>
+
+	<!-- ═══════════════════ PARAMETER ═══════════════════ -->
+	<parameter name="paramKonsultasiId" class="java.lang.Integer"/>
+
+	<!-- ═══════════════════ MAIN QUERY ═══════════════════ -->
+	<queryString language="SQL">
+		<![CDATA[
+        SELECT s.nis, s.nama, s.kelas, s.tahun_ajaran, s.semester, s.jurusan_sma, s.jenis_kelamin, s.cita_cita, s.hobi, s.prestasi,
+        s.nilai_matematika, s.nilai_ipa, s.nilai_ips, s.nilai_bahasa_ind, s.nilai_bahasa_ing, s.nilai_seni,
+        DATE_FORMAT(k.tanggal_konsultasi, '%d %M %Y') as tgl_test,
+        k.skor_teknologi, k.skor_sains, k.skor_sosial, k.skor_seni, k.skor_bisnis, k.skor_bahasa, k.skor_kesehatan, 
+        j.nama as rekomendasi_utama, j.rumpun as rumpun_utama, j.deskripsi as deskripsi_utama, j.prospek_kerja as prospek_utama,
+        j2.nama as rekomendasi_alt1, j2.rumpun as rumpun_alt1, j2.deskripsi as deskripsi_alt1, j2.prospek_kerja as prospek_alt1,
+        j3.nama as rekomendasi_alt2, j3.rumpun as rumpun_alt2, j3.deskripsi as deskripsi_alt2, j3.prospek_kerja as prospek_alt2,
+        k.catatan_konselor, k.tips_belajar, k.rekomendasi_kegiatan, k.status as status_konsultasi,
+        c.nama as nama_konselor, c.nip as nip_konselor
+        FROM konsultasi k
+        LEFT JOIN siswa s ON k.siswa_id = s.id
+        LEFT JOIN konselor c ON k.konselor_id = c.id
+        LEFT JOIN jurusan_kuliah j ON k.rekomendasi_utama_id = j.id
+        LEFT JOIN jurusan_kuliah j2 ON k.rekomendasi_alt1_id = j2.id
+        LEFT JOIN jurusan_kuliah j3 ON k.rekomendasi_alt2_id = j3.id
+        WHERE k.id = $P{paramKonsultasiId}
+        ]]>
+	</queryString>
+
+	<!-- ═══════════════════ FIELD DECLARATIONS ═══════════════════ -->
+	<field name="nis" class="java.lang.String"/>
+	<field name="nama" class="java.lang.String"/>
+	<field name="kelas" class="java.lang.String"/>
+	<field name="jurusan_sma" class="java.lang.String"/>
+	<field name="jenis_kelamin" class="java.lang.String"/>
+	<field name="cita_cita" class="java.lang.String"/>
+	<field name="hobi" class="java.lang.String"/>
+	<field name="prestasi" class="java.lang.String"/>
+	<field name="nilai_matematika" class="java.math.BigDecimal"/>
+	<field name="nilai_ipa" class="java.math.BigDecimal"/>
+	<field name="nilai_ips" class="java.math.BigDecimal"/>
+	<field name="nilai_bahasa_ind" class="java.math.BigDecimal"/>
+	<field name="nilai_bahasa_ing" class="java.math.BigDecimal"/>
+	<field name="nilai_seni" class="java.math.BigDecimal"/>
+	<field name="tgl_test" class="java.lang.String"/>
+	<field name="skor_teknologi" class="java.lang.Integer"/>
+	<field name="skor_sains" class="java.lang.Integer"/>
+	<field name="skor_sosial" class="java.lang.Integer"/>
+	<field name="skor_seni" class="java.lang.Integer"/>
+	<field name="skor_bisnis" class="java.lang.Integer"/>
+	<field name="skor_bahasa" class="java.lang.Integer"/>
+	<field name="skor_kesehatan" class="java.lang.Integer"/>
+	<field name="rekomendasi_utama" class="java.lang.String"/>
+	<field name="rumpun_utama" class="java.lang.String"/>
+	<field name="deskripsi_utama" class="java.lang.String"/>
+	<field name="prospek_utama" class="java.lang.String"/>
+	<field name="rekomendasi_alt1" class="java.lang.String"/>
+	<field name="rumpun_alt1" class="java.lang.String"/>
+	<field name="deskripsi_alt1" class="java.lang.String"/>
+	<field name="prospek_alt1" class="java.lang.String"/>
+	<field name="rekomendasi_alt2" class="java.lang.String"/>
+	<field name="rumpun_alt2" class="java.lang.String"/>
+	<field name="deskripsi_alt2" class="java.lang.String"/>
+	<field name="prospek_alt2" class="java.lang.String"/>
+	<field name="catatan_konselor" class="java.lang.String"/>
+	<field name="tips_belajar" class="java.lang.String"/>
+	<field name="rekomendasi_kegiatan" class="java.lang.String"/>
+	<field name="nama_konselor" class="java.lang.String"/>
+	<field name="nip_konselor" class="java.lang.String"/>
+
+	<!-- ═══════════════════════════════════════════════════════════ -->
+	<!-- ██  TITLE BAND – KOP SURAT & JUDUL LAPORAN               ██ -->
+	<!-- ═══════════════════════════════════════════════════════════ -->
+	<title>
+		<band height="135" splitType="Stretch">
+			<!-- Top decorative bar -->
+			<rectangle><reportElement x="0" y="0" width="535" height="6" backcolor="#1A237E" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+			<!-- Gold accent stripe -->
+			<rectangle><reportElement x="0" y="6" width="535" height="2" backcolor="#FFB300" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+
+			<!-- School Name -->
+			<staticText><reportElement x="0" y="14" width="535" height="22" forecolor="#1A237E"/><textElement textAlignment="Center" verticalAlignment="Middle"><font size="16" isBold="true"/></textElement><text><![CDATA[SMAN 1 CONTOH KOTA]]></text></staticText>
+			<!-- Address -->
+			<staticText><reportElement x="0" y="36" width="535" height="12" forecolor="#616161"/><textElement textAlignment="Center"><font size="8"/></textElement><text><![CDATA[Jalan Pendidikan No. 1, Kota Contoh, Provinsi Jaya 12345 | Telp: (021) 1234567]]></text></staticText>
+			<!-- Separator line -->
+			<line><reportElement x="0" y="52" width="535" height="1" forecolor="#1A237E"/><graphicElement><pen lineWidth="1.5" lineStyle="Solid"/></graphicElement></line>
+			<!-- Thin gold line -->
+			<line><reportElement x="0" y="54" width="535" height="1" forecolor="#FFB300"/><graphicElement><pen lineWidth="0.5"/></graphicElement></line>
+
+			<!-- Report Title -->
+			<staticText><reportElement x="0" y="62" width="535" height="22" forecolor="#1A237E"/><textElement textAlignment="Center" verticalAlignment="Middle"><font size="14" isBold="true"/></textElement><text><![CDATA[LAPORAN HASIL KONSULTASI KARIR & REKOMENDASI JURUSAN]]></text></staticText>
+			<!-- Subtitle -->
+			<staticText><reportElement x="0" y="84" width="535" height="14" forecolor="#9E9E9E"/><textElement textAlignment="Center"><font size="9" isItalic="true"/></textElement><text><![CDATA[Sistem Pakar Rekomendasi Jurusan Perguruan Tinggi — Laporan Individu Komprehensif]]></text></staticText>
+
+			<!-- Bottom accent bars (navy + gold gradient effect) -->
+			<rectangle><reportElement x="0" y="105" width="400" height="4" backcolor="#1A237E" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+			<rectangle><reportElement x="400" y="105" width="135" height="4" backcolor="#FFB300" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+
+			<!-- Document number & date -->
+			<textField><reportElement x="0" y="115" width="535" height="14" forecolor="#616161"/><textElement textAlignment="Center"><font size="8" isItalic="true"/></textElement><textFieldExpression><![CDATA["Tanggal Cetak: " + new java.text.SimpleDateFormat("dd MMMM yyyy, HH:mm", new java.util.Locale("id", "ID")).format(new java.util.Date()) + " WIB"]]></textFieldExpression></textField>
+		</band>
+	</title>
+
+	<!-- ═══════════════════════════════════════════════════════════ -->
+	<!-- ██  DETAIL BANDS                                          ██ -->
+	<!-- ═══════════════════════════════════════════════════════════ -->
+	<detail>
+
+	<!-- ─────────── BAND 1: PROFIL SISWA + NILAI RAPOR ─────────── -->
+		<band height="480" splitType="Stretch">
+			<!-- ▌ SECTION I: PROFIL SISWA ▌ -->
+			<rectangle><reportElement x="0" y="0" width="535" height="22" backcolor="#1A237E" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+			<staticText><reportElement x="10" y="0" width="525" height="22" forecolor="#FFFFFF"/><textElement verticalAlignment="Middle"><font size="11" isBold="true"/></textElement><text><![CDATA[I. DATA PROFIL SISWA]]></text></staticText>
+
+			<!-- Profile Card Frame -->
+			<frame><reportElement x="0" y="28" width="535" height="155" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box>
+				<!-- Row 1: Nama -->
+				<staticText><reportElement x="10" y="8" width="120" height="15"/><textElement><font isBold="true" size="9"/></textElement><text><![CDATA[Nama Lengkap]]></text></staticText>
+				<textField><reportElement x="130" y="8" width="140" height="15"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[": " + ($F{nama}!=null?$F{nama}:"-")]]></textFieldExpression></textField>
+				<staticText><reportElement x="280" y="8" width="100" height="15"/><textElement><font isBold="true" size="9"/></textElement><text><![CDATA[NIS]]></text></staticText>
+				<textField><reportElement x="380" y="8" width="145" height="15"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[": " + ($F{nis}!=null?$F{nis}:"-")]]></textFieldExpression></textField>
+
+				<!-- Row 2: Kelas & JK -->
+				<rectangle><reportElement x="5" y="26" width="525" height="17" backcolor="#EEF2F7" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+				<staticText><reportElement x="10" y="27" width="120" height="15"/><textElement><font isBold="true" size="9"/></textElement><text><![CDATA[Kelas / Jurusan SMA]]></text></staticText>
+				<textField><reportElement x="130" y="27" width="140" height="15"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[": " + ($F{kelas}!=null?$F{kelas}:"-") + " / " + ($F{jurusan_sma}!=null?$F{jurusan_sma}:"-")]]></textFieldExpression></textField>
+				<staticText><reportElement x="280" y="27" width="100" height="15"/><textElement><font isBold="true" size="9"/></textElement><text><![CDATA[Jenis Kelamin]]></text></staticText>
+				<textField><reportElement x="380" y="27" width="145" height="15"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[": " + ($F{jenis_kelamin}!=null?($F{jenis_kelamin}.equals("L")?"Laki-laki":"Perempuan"):"-")]]></textFieldExpression></textField>
+
+				<!-- Row 3: Tanggal & Cita-cita -->
+				<staticText><reportElement x="10" y="47" width="120" height="15"/><textElement><font isBold="true" size="9"/></textElement><text><![CDATA[Tanggal Konsultasi]]></text></staticText>
+				<textField><reportElement x="130" y="47" width="140" height="15"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[": " + ($F{tgl_test}!=null?$F{tgl_test}:"-")]]></textFieldExpression></textField>
+				<staticText><reportElement x="280" y="47" width="100" height="15"/><textElement><font isBold="true" size="9"/></textElement><text><![CDATA[Cita-cita]]></text></staticText>
+				<textField><reportElement x="380" y="47" width="145" height="15"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[": " + ($F{cita_cita}!=null?$F{cita_cita}:"-")]]></textFieldExpression></textField>
+
+				<!-- Row 4: Hobi -->
+				<rectangle><reportElement x="5" y="65" width="525" height="17" backcolor="#EEF2F7" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+				<staticText><reportElement x="10" y="66" width="120" height="15"/><textElement><font isBold="true" size="9"/></textElement><text><![CDATA[Hobi]]></text></staticText>
+				<textField isStretchWithOverflow="true"><reportElement x="130" y="66" width="395" height="15"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[": " + ($F{hobi}!=null?$F{hobi}:"-")]]></textFieldExpression></textField>
+
+				<!-- Row 5: Prestasi -->
+				<staticText><reportElement x="10" y="85" width="120" height="15"/><textElement><font isBold="true" size="9"/></textElement><text><![CDATA[Prestasi]]></text></staticText>
+				<textField isStretchWithOverflow="true"><reportElement x="130" y="85" width="395" height="15"/><textElement><font size="9"/></textElement><textFieldExpression><![CDATA[": " + ($F{prestasi}!=null?$F{prestasi}:"-")]]></textFieldExpression></textField>
+
+				<!-- Rekomendasi Utama Badge -->
+				<rectangle radius="5"><reportElement x="5" y="108" width="525" height="40" backcolor="#1A237E" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+				<staticText><reportElement x="15" y="110" width="200" height="14" forecolor="#FFB300"/><textElement><font size="8" isBold="true"/></textElement><text><![CDATA[REKOMENDASI JURUSAN UTAMA:]]></text></staticText>
+				<textField><reportElement x="15" y="124" width="505" height="20" forecolor="#FFFFFF"/><textElement><font size="13" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{rekomendasi_utama} != null ? $F{rekomendasi_utama} : "Belum Tersedia"]]></textFieldExpression></textField>
+			</frame>
+
+			<!-- ▌ SECTION II: ANALISIS NILAI RAPOR ▌ -->
+			<rectangle><reportElement x="0" y="192" width="535" height="22" backcolor="#1A237E" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+			<staticText><reportElement x="10" y="192" width="525" height="22" forecolor="#FFFFFF"/><textElement verticalAlignment="Middle"><font size="11" isBold="true"/></textElement><text><![CDATA[II. ANALISIS NILAI RAPOR]]></text></staticText>
+
+			<!-- Table Header -->
+			<staticText><reportElement x="0" y="220" width="200" height="18" forecolor="#FFFFFF" backcolor="#283593" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="9" isBold="true"/></textElement><text><![CDATA[Mata Pelajaran]]></text></staticText>
+			<staticText><reportElement x="200" y="220" width="100" height="18" forecolor="#FFFFFF" backcolor="#283593" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="9" isBold="true"/></textElement><text><![CDATA[Nilai Rata-rata]]></text></staticText>
+			<staticText><reportElement x="300" y="220" width="235" height="18" forecolor="#FFFFFF" backcolor="#283593" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="9" isBold="true"/></textElement><text><![CDATA[Kategori Kompetensi]]></text></staticText>
+
+			<!-- R1: Matematika -->
+			<staticText><reportElement x="0" y="238" width="200" height="16" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement verticalAlignment="Middle"><paragraph leftIndent="8"/></textElement><text><![CDATA[Matematika]]></text></staticText>
+			<textField><reportElement x="200" y="238" width="100" height="16" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font isBold="true"/></textElement><textFieldExpression><![CDATA[$F{nilai_matematika}]]></textFieldExpression></textField>
+			<textField><reportElement x="300" y="238" width="235" height="16" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{nilai_matematika} != null ? ($F{nilai_matematika}.doubleValue() >= 85 ? "SANGAT MEMADAI" : ($F{nilai_matematika}.doubleValue() >= 75 ? "MEMADAI" : "PERLU PENINGKATAN")) : "-"]]></textFieldExpression></textField>
+
+			<!-- R2: IPA -->
+			<staticText><reportElement x="0" y="254" width="200" height="16"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement verticalAlignment="Middle"><paragraph leftIndent="8"/></textElement><text><![CDATA[Ilmu Pengetahuan Alam (IPA)]]></text></staticText>
+			<textField><reportElement x="200" y="254" width="100" height="16"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font isBold="true"/></textElement><textFieldExpression><![CDATA[$F{nilai_ipa}]]></textFieldExpression></textField>
+			<textField><reportElement x="300" y="254" width="235" height="16"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{nilai_ipa} != null ? ($F{nilai_ipa}.doubleValue() >= 85 ? "SANGAT MEMADAI" : ($F{nilai_ipa}.doubleValue() >= 75 ? "MEMADAI" : "PERLU PENINGKATAN")) : "-"]]></textFieldExpression></textField>
+
+			<!-- R3: IPS -->
+			<staticText><reportElement x="0" y="270" width="200" height="16" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement verticalAlignment="Middle"><paragraph leftIndent="8"/></textElement><text><![CDATA[Ilmu Pengetahuan Sosial (IPS)]]></text></staticText>
+			<textField><reportElement x="200" y="270" width="100" height="16" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font isBold="true"/></textElement><textFieldExpression><![CDATA[$F{nilai_ips}]]></textFieldExpression></textField>
+			<textField><reportElement x="300" y="270" width="235" height="16" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{nilai_ips} != null ? ($F{nilai_ips}.doubleValue() >= 85 ? "SANGAT MEMADAI" : ($F{nilai_ips}.doubleValue() >= 75 ? "MEMADAI" : "PERLU PENINGKATAN")) : "-"]]></textFieldExpression></textField>
+
+			<!-- R4: B. Indo -->
+			<staticText><reportElement x="0" y="286" width="200" height="16"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement verticalAlignment="Middle"><paragraph leftIndent="8"/></textElement><text><![CDATA[Bahasa Indonesia]]></text></staticText>
+			<textField><reportElement x="200" y="286" width="100" height="16"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font isBold="true"/></textElement><textFieldExpression><![CDATA[$F{nilai_bahasa_ind}]]></textFieldExpression></textField>
+			<textField><reportElement x="300" y="286" width="235" height="16"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{nilai_bahasa_ind} != null ? ($F{nilai_bahasa_ind}.doubleValue() >= 85 ? "SANGAT MEMADAI" : ($F{nilai_bahasa_ind}.doubleValue() >= 75 ? "MEMADAI" : "PERLU PENINGKATAN")) : "-"]]></textFieldExpression></textField>
+
+			<!-- R5: B. Ing -->
+			<staticText><reportElement x="0" y="302" width="200" height="16" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement verticalAlignment="Middle"><paragraph leftIndent="8"/></textElement><text><![CDATA[Bahasa Inggris]]></text></staticText>
+			<textField><reportElement x="200" y="302" width="100" height="16" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font isBold="true"/></textElement><textFieldExpression><![CDATA[$F{nilai_bahasa_ing}]]></textFieldExpression></textField>
+			<textField><reportElement x="300" y="302" width="235" height="16" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{nilai_bahasa_ing} != null ? ($F{nilai_bahasa_ing}.doubleValue() >= 85 ? "SANGAT MEMADAI" : ($F{nilai_bahasa_ing}.doubleValue() >= 75 ? "MEMADAI" : "PERLU PENINGKATAN")) : "-"]]></textFieldExpression></textField>
+
+			<!-- R6: Seni -->
+			<staticText><reportElement x="0" y="318" width="200" height="16"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement verticalAlignment="Middle"><paragraph leftIndent="8"/></textElement><text><![CDATA[Seni Budaya]]></text></staticText>
+			<textField><reportElement x="200" y="318" width="100" height="16"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font isBold="true"/></textElement><textFieldExpression><![CDATA[$F{nilai_seni}]]></textFieldExpression></textField>
+			<textField><reportElement x="300" y="318" width="235" height="16"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{nilai_seni} != null ? ($F{nilai_seni}.doubleValue() >= 85 ? "SANGAT MEMADAI" : ($F{nilai_seni}.doubleValue() >= 75 ? "MEMADAI" : "PERLU PENINGKATAN")) : "-"]]></textFieldExpression></textField>
+
+			<!-- RATA-RATA ROW -->
+			<staticText><reportElement x="0" y="338" width="200" height="18" forecolor="#FFFFFF" backcolor="#00897B" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#00897B"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="9" isBold="true"/></textElement><text><![CDATA[RATA-RATA AKADEMIK]]></text></staticText>
+			<textField><reportElement x="200" y="338" width="100" height="18" forecolor="#FFFFFF" backcolor="#00897B" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#00897B"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="10" isBold="true"/></textElement><textFieldExpression><![CDATA[($F{nilai_matematika} != null && $F{nilai_ipa} != null) ? new java.text.DecimalFormat("0.00").format(($F{nilai_matematika}.doubleValue() + $F{nilai_ipa}.doubleValue() + $F{nilai_ips}.doubleValue() + $F{nilai_bahasa_ind}.doubleValue() + $F{nilai_bahasa_ing}.doubleValue() + $F{nilai_seni}.doubleValue()) / 6.0) : "-"]]></textFieldExpression></textField>
+			<textField><reportElement x="300" y="338" width="235" height="18" forecolor="#FFFFFF" backcolor="#00897B" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#00897B"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA[($F{nilai_matematika} != null && $F{nilai_ipa} != null) ? (((($F{nilai_matematika}.doubleValue() + $F{nilai_ipa}.doubleValue() + $F{nilai_ips}.doubleValue() + $F{nilai_bahasa_ind}.doubleValue() + $F{nilai_bahasa_ing}.doubleValue() + $F{nilai_seni}.doubleValue()) / 6.0) >= 85) ? "EXCELLENT" : ((($F{nilai_matematika}.doubleValue() + $F{nilai_ipa}.doubleValue() + $F{nilai_ips}.doubleValue() + $F{nilai_bahasa_ind}.doubleValue() + $F{nilai_bahasa_ing}.doubleValue() + $F{nilai_seni}.doubleValue()) / 6.0) >= 75) ? "GOOD" : "NEEDS IMPROVEMENT") : "-"]]></textFieldExpression></textField>
+
+			<!-- Footnote -->
+			<staticText><reportElement x="0" y="365" width="535" height="12" forecolor="#9E9E9E"/><textElement><font size="7" isItalic="true"/></textElement><text><![CDATA[*Kategori: SANGAT MEMADAI (≥85) | MEMADAI (≥75) | PERLU PENINGKATAN (<75). Rata-rata dihitung dari 6 mata pelajaran inti.]]></text></staticText>
+
+			<!-- Decorative line -->
+			<line><reportElement x="0" y="382" width="535" height="1" forecolor="#FFB300"/><graphicElement><pen lineWidth="1.0"/></graphicElement></line>
+
+			<!-- Summary Text -->
+			<frame><reportElement x="0" y="390" width="535" height="80" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/><leftPen lineWidth="3.0" lineColor="#1A237E"/></box>
+				<staticText><reportElement x="10" y="5" width="515" height="14" forecolor="#1A237E"/><textElement><font size="9" isBold="true"/></textElement><text><![CDATA[RINGKASAN PROFIL AKADEMIK:]]></text></staticText>
+				<textField isStretchWithOverflow="true"><reportElement x="10" y="22" width="515" height="50" forecolor="#616161"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA["Siswa " + ($F{nama}!=null?$F{nama}:"-") + " dari kelas " + ($F{kelas}!=null?$F{kelas}:"-") + " jurusan " + ($F{jurusan_sma}!=null?$F{jurusan_sma}:"-") + " memiliki rata-rata akademik " + (($F{nilai_matematika} != null && $F{nilai_ipa} != null) ? new java.text.DecimalFormat("0.00").format(($F{nilai_matematika}.doubleValue() + $F{nilai_ipa}.doubleValue() + $F{nilai_ips}.doubleValue() + $F{nilai_bahasa_ind}.doubleValue() + $F{nilai_bahasa_ing}.doubleValue() + $F{nilai_seni}.doubleValue()) / 6.0) : "-") + ". Berdasarkan hasil asesmen sistem pakar, siswa direkomendasikan untuk menempuh pendidikan tinggi di jurusan " + ($F{rekomendasi_utama}!=null?$F{rekomendasi_utama}:"-") + " (Rumpun: " + ($F{rumpun_utama}!=null?$F{rumpun_utama}:"-") + ")."]]></textFieldExpression></textField>
+			</frame>
+		</band>
+
+	<!-- ─────────── BAND 2A: CHART MINAT & BAKAT (BAR) ─────────── -->
+		<band height="400" splitType="Stretch">
+			<!-- ▌ SECTION III: HASIL ASESMEN MINAT & BAKAT ▌ -->
+			<rectangle><reportElement x="0" y="5" width="535" height="22" backcolor="#1A237E" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+			<staticText><reportElement x="10" y="5" width="525" height="22" forecolor="#FFFFFF"/><textElement verticalAlignment="Middle"><font size="11" isBold="true"/></textElement><text><![CDATA[III. HASIL ASESMEN MINAT & BAKAT]]></text></staticText>
+
+			<!-- BAR CHART: Skor Minat -->
+			<barChart>
+				<chart>
+					<reportElement x="0" y="35" width="535" height="200"/>
+					<chartTitle><font size="10" isBold="true"/><titleExpression><![CDATA["Distribusi Skor Asesmen Minat (Maksimal: 32 Poin)"]]></titleExpression></chartTitle>
+					<chartSubtitle><font size="8"/></chartSubtitle>
+					<chartLegend position="Bottom"/>
+				</chart>
+				<categoryDataset>
+					<categorySeries><seriesExpression><![CDATA["Skor Minat"]]></seriesExpression><categoryExpression><![CDATA["Teknologi"]]></categoryExpression><valueExpression><![CDATA[$F{skor_teknologi}]]></valueExpression></categorySeries>
+					<categorySeries><seriesExpression><![CDATA["Skor Minat"]]></seriesExpression><categoryExpression><![CDATA["Sains"]]></categoryExpression><valueExpression><![CDATA[$F{skor_sains}]]></valueExpression></categorySeries>
+					<categorySeries><seriesExpression><![CDATA["Skor Minat"]]></seriesExpression><categoryExpression><![CDATA["Sosial"]]></categoryExpression><valueExpression><![CDATA[$F{skor_sosial}]]></valueExpression></categorySeries>
+					<categorySeries><seriesExpression><![CDATA["Skor Minat"]]></seriesExpression><categoryExpression><![CDATA["Seni"]]></categoryExpression><valueExpression><![CDATA[$F{skor_seni}]]></valueExpression></categorySeries>
+					<categorySeries><seriesExpression><![CDATA["Skor Minat"]]></seriesExpression><categoryExpression><![CDATA["Bisnis"]]></categoryExpression><valueExpression><![CDATA[$F{skor_bisnis}]]></valueExpression></categorySeries>
+					<categorySeries><seriesExpression><![CDATA["Skor Minat"]]></seriesExpression><categoryExpression><![CDATA["Bahasa"]]></categoryExpression><valueExpression><![CDATA[$F{skor_bahasa}]]></valueExpression></categorySeries>
+					<categorySeries><seriesExpression><![CDATA["Skor Minat"]]></seriesExpression><categoryExpression><![CDATA["Kesehatan"]]></categoryExpression><valueExpression><![CDATA[$F{skor_kesehatan}]]></valueExpression></categorySeries>
+				</categoryDataset>
+				<barPlot><plot/><itemLabel/><categoryAxisFormat><axisFormat/></categoryAxisFormat><valueAxisFormat><axisFormat/></valueAxisFormat></barPlot>
+			</barChart>
+
+			<!-- Detail Score Table -->
+			<staticText><reportElement x="0" y="242" width="535" height="14" forecolor="#1A237E"/><textElement><font size="9" isBold="true"/></textElement><text><![CDATA[Detail Skor Asesmen Per Kategori Minat:]]></text></staticText>
+			<!-- Table Header -->
+			<staticText><reportElement x="0" y="258" width="40" height="16" forecolor="#FFFFFF" backcolor="#283593" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><text><![CDATA[No]]></text></staticText>
+			<staticText><reportElement x="40" y="258" width="150" height="16" forecolor="#FFFFFF" backcolor="#283593" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><text><![CDATA[Kategori Minat]]></text></staticText>
+			<staticText><reportElement x="190" y="258" width="90" height="16" forecolor="#FFFFFF" backcolor="#283593" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><text><![CDATA[Skor (dari 32)]]></text></staticText>
+			<staticText><reportElement x="280" y="258" width="100" height="16" forecolor="#FFFFFF" backcolor="#283593" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><text><![CDATA[Persentase]]></text></staticText>
+			<staticText><reportElement x="380" y="258" width="155" height="16" forecolor="#FFFFFF" backcolor="#283593" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><text><![CDATA[Level Kompetensi]]></text></staticText>
+
+			<!-- Score Row 1: Teknologi -->
+			<staticText><reportElement x="0" y="274" width="40" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8"/></textElement><text><![CDATA[1]]></text></staticText>
+			<staticText><reportElement x="40" y="274" width="150" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement verticalAlignment="Middle"><font size="8"/><paragraph leftIndent="5"/></textElement><text><![CDATA[Teknologi Informasi]]></text></staticText>
+			<textField><reportElement x="190" y="274" width="90" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{skor_teknologi} + " / 32"]]></textFieldExpression></textField>
+			<textField><reportElement x="280" y="274" width="100" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8"/></textElement><textFieldExpression><![CDATA[new java.text.DecimalFormat("0.0").format(($F{skor_teknologi}.doubleValue() / 32.0) * 100) + "%"]]></textFieldExpression></textField>
+			<textField><reportElement x="380" y="274" width="155" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{skor_teknologi} >= 24 ? "TINGGI" : ($F{skor_teknologi} >= 16 ? "SEDANG" : "RENDAH")]]></textFieldExpression></textField>
+
+			<!-- Score Row 2: Sains -->
+			<staticText><reportElement x="0" y="289" width="40" height="15"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8"/></textElement><text><![CDATA[2]]></text></staticText>
+			<staticText><reportElement x="40" y="289" width="150" height="15"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement verticalAlignment="Middle"><font size="8"/><paragraph leftIndent="5"/></textElement><text><![CDATA[Sains & Penelitian]]></text></staticText>
+			<textField><reportElement x="190" y="289" width="90" height="15"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{skor_sains} + " / 32"]]></textFieldExpression></textField>
+			<textField><reportElement x="280" y="289" width="100" height="15"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8"/></textElement><textFieldExpression><![CDATA[new java.text.DecimalFormat("0.0").format(($F{skor_sains}.doubleValue() / 32.0) * 100) + "%"]]></textFieldExpression></textField>
+			<textField><reportElement x="380" y="289" width="155" height="15"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{skor_sains} >= 24 ? "TINGGI" : ($F{skor_sains} >= 16 ? "SEDANG" : "RENDAH")]]></textFieldExpression></textField>
+
+			<!-- Score Row 3: Sosial -->
+			<staticText><reportElement x="0" y="304" width="40" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8"/></textElement><text><![CDATA[3]]></text></staticText>
+			<staticText><reportElement x="40" y="304" width="150" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement verticalAlignment="Middle"><font size="8"/><paragraph leftIndent="5"/></textElement><text><![CDATA[Sosial & Humaniora]]></text></staticText>
+			<textField><reportElement x="190" y="304" width="90" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{skor_sosial} + " / 32"]]></textFieldExpression></textField>
+			<textField><reportElement x="280" y="304" width="100" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8"/></textElement><textFieldExpression><![CDATA[new java.text.DecimalFormat("0.0").format(($F{skor_sosial}.doubleValue() / 32.0) * 100) + "%"]]></textFieldExpression></textField>
+			<textField><reportElement x="380" y="304" width="155" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{skor_sosial} >= 24 ? "TINGGI" : ($F{skor_sosial} >= 16 ? "SEDANG" : "RENDAH")]]></textFieldExpression></textField>
+
+			<!-- Score Row 4: Seni -->
+			<staticText><reportElement x="0" y="319" width="40" height="15"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8"/></textElement><text><![CDATA[4]]></text></staticText>
+			<staticText><reportElement x="40" y="319" width="150" height="15"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement verticalAlignment="Middle"><font size="8"/><paragraph leftIndent="5"/></textElement><text><![CDATA[Seni & Desain]]></text></staticText>
+			<textField><reportElement x="190" y="319" width="90" height="15"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{skor_seni} + " / 32"]]></textFieldExpression></textField>
+			<textField><reportElement x="280" y="319" width="100" height="15"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8"/></textElement><textFieldExpression><![CDATA[new java.text.DecimalFormat("0.0").format(($F{skor_seni}.doubleValue() / 32.0) * 100) + "%"]]></textFieldExpression></textField>
+			<textField><reportElement x="380" y="319" width="155" height="15"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{skor_seni} >= 24 ? "TINGGI" : ($F{skor_seni} >= 16 ? "SEDANG" : "RENDAH")]]></textFieldExpression></textField>
+
+			<!-- Score Row 5: Bisnis -->
+			<staticText><reportElement x="0" y="334" width="40" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8"/></textElement><text><![CDATA[5]]></text></staticText>
+			<staticText><reportElement x="40" y="334" width="150" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement verticalAlignment="Middle"><font size="8"/><paragraph leftIndent="5"/></textElement><text><![CDATA[Bisnis & Manajemen]]></text></staticText>
+			<textField><reportElement x="190" y="334" width="90" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{skor_bisnis} + " / 32"]]></textFieldExpression></textField>
+			<textField><reportElement x="280" y="334" width="100" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8"/></textElement><textFieldExpression><![CDATA[new java.text.DecimalFormat("0.0").format(($F{skor_bisnis}.doubleValue() / 32.0) * 100) + "%"]]></textFieldExpression></textField>
+			<textField><reportElement x="380" y="334" width="155" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{skor_bisnis} >= 24 ? "TINGGI" : ($F{skor_bisnis} >= 16 ? "SEDANG" : "RENDAH")]]></textFieldExpression></textField>
+
+			<!-- Score Row 6: Bahasa -->
+			<staticText><reportElement x="0" y="349" width="40" height="15"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8"/></textElement><text><![CDATA[6]]></text></staticText>
+			<staticText><reportElement x="40" y="349" width="150" height="15"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement verticalAlignment="Middle"><font size="8"/><paragraph leftIndent="5"/></textElement><text><![CDATA[Bahasa & Komunikasi]]></text></staticText>
+			<textField><reportElement x="190" y="349" width="90" height="15"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{skor_bahasa} + " / 32"]]></textFieldExpression></textField>
+			<textField><reportElement x="280" y="349" width="100" height="15"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8"/></textElement><textFieldExpression><![CDATA[new java.text.DecimalFormat("0.0").format(($F{skor_bahasa}.doubleValue() / 32.0) * 100) + "%"]]></textFieldExpression></textField>
+			<textField><reportElement x="380" y="349" width="155" height="15"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{skor_bahasa} >= 24 ? "TINGGI" : ($F{skor_bahasa} >= 16 ? "SEDANG" : "RENDAH")]]></textFieldExpression></textField>
+
+			<!-- Score Row 7: Kesehatan -->
+			<staticText><reportElement x="0" y="364" width="40" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8"/></textElement><text><![CDATA[7]]></text></staticText>
+			<staticText><reportElement x="40" y="364" width="150" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement verticalAlignment="Middle"><font size="8"/><paragraph leftIndent="5"/></textElement><text><![CDATA[Kesehatan & Medis]]></text></staticText>
+			<textField><reportElement x="190" y="364" width="90" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{skor_kesehatan} + " / 32"]]></textFieldExpression></textField>
+			<textField><reportElement x="280" y="364" width="100" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8"/></textElement><textFieldExpression><![CDATA[new java.text.DecimalFormat("0.0").format(($F{skor_kesehatan}.doubleValue() / 32.0) * 100) + "%"]]></textFieldExpression></textField>
+			<textField><reportElement x="380" y="364" width="155" height="15" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{skor_kesehatan} >= 24 ? "TINGGI" : ($F{skor_kesehatan} >= 16 ? "SEDANG" : "RENDAH")]]></textFieldExpression></textField>
+
+			<staticText><reportElement x="0" y="384" width="535" height="12" forecolor="#9E9E9E"/><textElement><font size="7" isItalic="true"/></textElement><text><![CDATA[*Level: TINGGI (≥24/32) | SEDANG (16-23/32) | RENDAH (<16/32). Skor diperoleh dari 35 pertanyaan asesmen psikologis berbasis sistem pakar.]]></text></staticText>
+
+		</band>
+
+	<!-- ─────────── BAND 2B: CHART MINAT & BAKAT (PIE) ─────────── -->
+		<band height="280" splitType="Stretch">
+			<!-- PIE CHART: Proporsi Minat -->
+			<pieChart>
+				<chart>
+					<reportElement x="0" y="5" width="535" height="200"/>
+					<chartTitle><font size="10" isBold="true"/><titleExpression><![CDATA["Proporsi Minat Berdasarkan Skor Asesmen"]]></titleExpression></chartTitle>
+					<chartSubtitle><font size="8"/></chartSubtitle>
+					<chartLegend position="Right"/>
+				</chart>
+				<pieDataset>
+					<pieSeries><keyExpression><![CDATA["Teknologi"]]></keyExpression><valueExpression><![CDATA[$F{skor_teknologi}]]></valueExpression></pieSeries>
+					<pieSeries><keyExpression><![CDATA["Sains"]]></keyExpression><valueExpression><![CDATA[$F{skor_sains}]]></valueExpression></pieSeries>
+					<pieSeries><keyExpression><![CDATA["Sosial"]]></keyExpression><valueExpression><![CDATA[$F{skor_sosial}]]></valueExpression></pieSeries>
+					<pieSeries><keyExpression><![CDATA["Seni"]]></keyExpression><valueExpression><![CDATA[$F{skor_seni}]]></valueExpression></pieSeries>
+					<pieSeries><keyExpression><![CDATA["Bisnis"]]></keyExpression><valueExpression><![CDATA[$F{skor_bisnis}]]></valueExpression></pieSeries>
+					<pieSeries><keyExpression><![CDATA["Bahasa"]]></keyExpression><valueExpression><![CDATA[$F{skor_bahasa}]]></valueExpression></pieSeries>
+					<pieSeries><keyExpression><![CDATA["Kesehatan"]]></keyExpression><valueExpression><![CDATA[$F{skor_kesehatan}]]></valueExpression></pieSeries>
+				</pieDataset>
+				<piePlot><plot/></piePlot>
+			</pieChart>
+
+			<!-- Decorative bottom -->
+			<line><reportElement x="0" y="215" width="535" height="1" forecolor="#FFB300"/><graphicElement><pen lineWidth="1.0"/></graphicElement></line>
+
+			<!-- Insight Box -->
+			<frame><reportElement x="0" y="225" width="535" height="45" backcolor="#EEF2F7" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/><leftPen lineWidth="3.0" lineColor="#FFB300"/></box>
+				<staticText><reportElement x="10" y="5" width="515" height="12" forecolor="#EF6C00"/><textElement><font size="8" isBold="true"/></textElement><text><![CDATA[INSIGHT ASESMEN:]]></text></staticText>
+				<textField isStretchWithOverflow="true"><reportElement x="10" y="20" width="515" height="18" forecolor="#616161"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA["Berdasarkan distribusi skor 7 kategori minat, siswa menunjukkan kecenderungan dominan yang dapat menjadi dasar pemilihan jurusan perguruan tinggi yang tepat. Skor tertinggi menjadi indikator utama dalam rekomendasi sistem pakar."]]></textFieldExpression></textField>
+			</frame>
+		</band>
+
+	<!-- ─────────── BAND 3: REKOMENDASI UTAMA + ALT 1 + PTN ─────────── -->
+		<band height="440" splitType="Stretch">
+			<!-- ▌ SECTION IV: STRATEGI PEMILIHAN JURUSAN & TARGET PTN ▌ -->
+			<rectangle><reportElement x="0" y="0" width="535" height="22" backcolor="#1A237E" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+			<staticText><reportElement x="10" y="0" width="525" height="22" forecolor="#FFFFFF"/><textElement verticalAlignment="Middle"><font size="11" isBold="true"/></textElement><text><![CDATA[IV. STRATEGI PEMILIHAN JURUSAN & TARGET PTN]]></text></staticText>
+
+			<!-- ★ PRIORITAS UTAMA CARD -->
+			<frame><reportElement x="0" y="30" width="535" height="80" backcolor="#EEF2F7" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/><leftPen lineWidth="4.0" lineColor="#1A237E"/></box>
+				<staticText><reportElement x="10" y="5" width="200" height="14" forecolor="#FFB300"/><textElement><font size="9" isBold="true"/></textElement><text><![CDATA[★ PRIORITAS UTAMA]]></text></staticText>
+				<textField isStretchWithOverflow="true"><reportElement x="10" y="20" width="515" height="18" forecolor="#1A237E"/><textElement><font size="13" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{rekomendasi_utama} != null ? $F{rekomendasi_utama} : "N/A"]]></textFieldExpression></textField>
+				<textField isStretchWithOverflow="true"><reportElement x="10" y="40" width="250" height="12" forecolor="#616161"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA["Rumpun: " + ($F{rumpun_utama}!=null?$F{rumpun_utama}:"-")]]></textFieldExpression></textField>
+				<textField isStretchWithOverflow="true"><reportElement x="260" y="40" width="265" height="12" forecolor="#616161"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA["Prospek: " + ($F{prospek_utama}!=null?$F{prospek_utama}:"-")]]></textFieldExpression></textField>
+				<textField isStretchWithOverflow="true"><reportElement x="10" y="55" width="515" height="18" forecolor="#616161"/><textElement><font size="7" isItalic="true"/></textElement><textFieldExpression><![CDATA[$F{deskripsi_utama}!=null?$F{deskripsi_utama}:"-"]]></textFieldExpression></textField>
+			</frame>
+
+			<!-- PTN Header Rank 1 -->
+			<staticText><reportElement x="0" y="118" width="535" height="16" forecolor="#FFFFFF" backcolor="#283593" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><text><![CDATA[Target PTN — Prioritas Utama]]></text></staticText>
+			<staticText><reportElement x="0" y="134" width="140" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[PTN Target]]></text></staticText>
+			<staticText><reportElement x="140" y="134" width="70" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[Provinsi]]></text></staticText>
+			<staticText><reportElement x="210" y="134" width="60" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[PG SNBP]]></text></staticText>
+			<staticText><reportElement x="270" y="134" width="60" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[PG SNBT]]></text></staticText>
+			<staticText><reportElement x="330" y="134" width="100" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[Est. Biaya/SMT]]></text></staticText>
+			<staticText><reportElement x="430" y="134" width="105" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[Peluang Personal]]></text></staticText>
+
+			<!-- jr:list Rank 1 -->
+			<componentElement><reportElement x="0" y="149" width="535" height="15"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="DatasetPTN"><datasetParameter name="pKonsultasiId"><datasetParameterExpression><![CDATA[$P{paramKonsultasiId}]]></datasetParameterExpression></datasetParameter><datasetParameter name="pRank"><datasetParameterExpression><![CDATA[1]]></datasetParameterExpression></datasetParameter><connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression></datasetRun>
+					<jr:listContents height="15" width="535">
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="140" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement><textFieldExpression><![CDATA[$F{universitas}]]></textFieldExpression></textField>
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="140" y="0" width="70" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement><textFieldExpression><![CDATA[$F{provinsi}]]></textFieldExpression></textField>
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="210" y="0" width="60" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement><textFieldExpression><![CDATA[$F{passing_grade_snbp}]]></textFieldExpression></textField>
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="270" y="0" width="60" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement><textFieldExpression><![CDATA[$F{passing_grade_snbt}]]></textFieldExpression></textField>
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="330" y="0" width="100" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement><textFieldExpression><![CDATA[$F{biaya_kuliah} != null ? "Rp " + new java.text.DecimalFormat("#,###").format($F{biaya_kuliah}) : "-"]]></textFieldExpression></textField>
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="430" y="0" width="105" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{peluang_personal} != null ? new java.text.DecimalFormat("0.##").format($F{peluang_personal}) + "%" : "-"]]></textFieldExpression></textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+
+			<!-- ★ ALTERNATIF 1 CARD -->
+			<frame><reportElement x="0" y="180" width="535" height="65" backcolor="#EEF2F7" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/><leftPen lineWidth="4.0" lineColor="#00897B"/></box>
+				<staticText><reportElement x="10" y="5" width="200" height="14" forecolor="#00897B"/><textElement><font size="9" isBold="true"/></textElement><text><![CDATA[★ ALTERNATIF 1]]></text></staticText>
+				<textField isStretchWithOverflow="true"><reportElement x="10" y="20" width="515" height="16" forecolor="#00897B"/><textElement><font size="11" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{rekomendasi_alt1} != null ? $F{rekomendasi_alt1} : "N/A"]]></textFieldExpression></textField>
+				<textField isStretchWithOverflow="true"><reportElement x="10" y="38" width="250" height="12" forecolor="#616161"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA["Rumpun: " + ($F{rumpun_alt1}!=null?$F{rumpun_alt1}:"-")]]></textFieldExpression></textField>
+				<textField isStretchWithOverflow="true"><reportElement x="260" y="38" width="265" height="12" forecolor="#616161"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA["Prospek: " + ($F{prospek_alt1}!=null?$F{prospek_alt1}:"-")]]></textFieldExpression></textField>
+			</frame>
+
+			<!-- PTN Header Rank 2 -->
+			<staticText><reportElement x="0" y="253" width="535" height="16" forecolor="#FFFFFF" backcolor="#00897B" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#00897B"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><text><![CDATA[Target PTN — Alternatif 1]]></text></staticText>
+			<staticText><reportElement x="0" y="269" width="140" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[PTN Target]]></text></staticText>
+			<staticText><reportElement x="140" y="269" width="70" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[Provinsi]]></text></staticText>
+			<staticText><reportElement x="210" y="269" width="60" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[PG SNBP]]></text></staticText>
+			<staticText><reportElement x="270" y="269" width="60" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[PG SNBT]]></text></staticText>
+			<staticText><reportElement x="330" y="269" width="100" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[Est. Biaya/SMT]]></text></staticText>
+			<staticText><reportElement x="430" y="269" width="105" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[Peluang Personal]]></text></staticText>
+
+			<!-- jr:list Rank 2 -->
+			<componentElement><reportElement x="0" y="284" width="535" height="15"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="DatasetPTN"><datasetParameter name="pKonsultasiId"><datasetParameterExpression><![CDATA[$P{paramKonsultasiId}]]></datasetParameterExpression></datasetParameter><datasetParameter name="pRank"><datasetParameterExpression><![CDATA[2]]></datasetParameterExpression></datasetParameter><connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression></datasetRun>
+					<jr:listContents height="15" width="535">
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="140" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement><textFieldExpression><![CDATA[$F{universitas}]]></textFieldExpression></textField>
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="140" y="0" width="70" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement><textFieldExpression><![CDATA[$F{provinsi}]]></textFieldExpression></textField>
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="210" y="0" width="60" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement><textFieldExpression><![CDATA[$F{passing_grade_snbp}]]></textFieldExpression></textField>
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="270" y="0" width="60" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement><textFieldExpression><![CDATA[$F{passing_grade_snbt}]]></textFieldExpression></textField>
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="330" y="0" width="100" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement><textFieldExpression><![CDATA[$F{biaya_kuliah} != null ? "Rp " + new java.text.DecimalFormat("#,###").format($F{biaya_kuliah}) : "-"]]></textFieldExpression></textField>
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="430" y="0" width="105" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{peluang_personal} != null ? new java.text.DecimalFormat("0.##").format($F{peluang_personal}) + "%" : "-"]]></textFieldExpression></textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+
+			<!-- ★ ALTERNATIF 2 CARD -->
+			<frame><reportElement x="0" y="315" width="535" height="50" backcolor="#EEF2F7" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/><leftPen lineWidth="4.0" lineColor="#EF6C00"/></box>
+				<staticText><reportElement x="10" y="5" width="200" height="14" forecolor="#EF6C00"/><textElement><font size="9" isBold="true"/></textElement><text><![CDATA[★ ALTERNATIF 2]]></text></staticText>
+				<textField isStretchWithOverflow="true"><reportElement x="10" y="20" width="515" height="16" forecolor="#EF6C00"/><textElement><font size="11" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{rekomendasi_alt2} != null ? $F{rekomendasi_alt2} : "N/A"]]></textFieldExpression></textField>
+			</frame>
+
+			<!-- PTN Rank 3 Header -->
+			<staticText><reportElement x="0" y="373" width="535" height="16" forecolor="#FFFFFF" backcolor="#EF6C00" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#EF6C00"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="8" isBold="true"/></textElement><text><![CDATA[Target PTN — Alternatif 2]]></text></staticText>
+			<staticText><reportElement x="0" y="389" width="140" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[PTN Target]]></text></staticText>
+			<staticText><reportElement x="140" y="389" width="70" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[Provinsi]]></text></staticText>
+			<staticText><reportElement x="210" y="389" width="60" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[PG SNBP]]></text></staticText>
+			<staticText><reportElement x="270" y="389" width="60" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[PG SNBT]]></text></staticText>
+			<staticText><reportElement x="330" y="389" width="100" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[Est. Biaya/SMT]]></text></staticText>
+			<staticText><reportElement x="430" y="389" width="105" height="15" forecolor="#FFFFFF" backcolor="#1A237E" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#1A237E"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><text><![CDATA[Peluang Personal]]></text></staticText>
+
+			<!-- jr:list Rank 3 -->
+			<componentElement><reportElement x="0" y="404" width="535" height="15"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="DatasetPTN"><datasetParameter name="pKonsultasiId"><datasetParameterExpression><![CDATA[$P{paramKonsultasiId}]]></datasetParameterExpression></datasetParameter><datasetParameter name="pRank"><datasetParameterExpression><![CDATA[3]]></datasetParameterExpression></datasetParameter><connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression></datasetRun>
+					<jr:listContents height="15" width="535">
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="140" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement><textFieldExpression><![CDATA[$F{universitas}]]></textFieldExpression></textField>
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="140" y="0" width="70" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement><textFieldExpression><![CDATA[$F{provinsi}]]></textFieldExpression></textField>
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="210" y="0" width="60" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement><textFieldExpression><![CDATA[$F{passing_grade_snbp}]]></textFieldExpression></textField>
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="270" y="0" width="60" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement><textFieldExpression><![CDATA[$F{passing_grade_snbt}]]></textFieldExpression></textField>
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="330" y="0" width="100" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7"/></textElement><textFieldExpression><![CDATA[$F{biaya_kuliah} != null ? "Rp " + new java.text.DecimalFormat("#,###").format($F{biaya_kuliah}) : "-"]]></textFieldExpression></textField>
+						<textField isStretchWithOverflow="true"><reportElement stretchType="RelativeToTallestObject" x="430" y="0" width="105" height="15"/><box padding="2"><pen lineWidth="0.5" lineColor="#CCCCCC"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font size="7" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{peluang_personal} != null ? new java.text.DecimalFormat("0.##").format($F{peluang_personal}) + "%" : "-"]]></textFieldExpression></textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+
+	<!-- ─────────── BAND 4: CATATAN KONSELOR ─────────── -->
+		<band height="280" splitType="Stretch">
+			<!-- ▌ SECTION V: CATATAN KONSELOR ▌ -->
+			<rectangle><reportElement x="0" y="5" width="535" height="22" backcolor="#1A237E" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+			<staticText><reportElement x="10" y="5" width="525" height="22" forecolor="#FFFFFF"/><textElement verticalAlignment="Middle"><font size="11" isBold="true"/></textElement><text><![CDATA[V. CATATAN KONSELOR & STRATEGI UMUM]]></text></staticText>
+
+			<!-- Catatan Box -->
+			<frame><reportElement positionType="Float" x="0" y="35" width="535" height="65" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/><leftPen lineWidth="3.0" lineColor="#1A237E"/></box>
+				<staticText><reportElement x="10" y="5" width="300" height="14" forecolor="#1A237E"/><textElement><font size="9" isBold="true"/></textElement><text><![CDATA[Catatan Khusus Guru BK:]]></text></staticText>
+				<textField isStretchWithOverflow="true"><reportElement positionType="Float" x="10" y="22" width="515" height="35" forecolor="#212121"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA[$F{catatan_konselor} != null && !$F{catatan_konselor}.trim().isEmpty() ? $F{catatan_konselor} : "Tidak ada catatan khusus."]]></textFieldExpression></textField>
+			</frame>
+
+			<!-- Tips Box -->
+			<frame><reportElement positionType="Float" x="0" y="110" width="535" height="65" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/><leftPen lineWidth="3.0" lineColor="#00897B"/></box>
+				<staticText><reportElement x="10" y="5" width="300" height="14" forecolor="#00897B"/><textElement><font size="9" isBold="true"/></textElement><text><![CDATA[Tips Belajar & Persiapan:]]></text></staticText>
+				<textField isStretchWithOverflow="true"><reportElement positionType="Float" x="10" y="22" width="515" height="35" forecolor="#212121"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA[$F{tips_belajar} != null && !$F{tips_belajar}.trim().isEmpty() ? $F{tips_belajar} : "Tidak ada tips khusus."]]></textFieldExpression></textField>
+			</frame>
+
+			<!-- Kegiatan Box -->
+			<frame><reportElement positionType="Float" x="0" y="185" width="535" height="65" backcolor="#F5F7FA" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/><leftPen lineWidth="3.0" lineColor="#FFB300"/></box>
+				<staticText><reportElement x="10" y="5" width="300" height="14" forecolor="#EF6C00"/><textElement><font size="9" isBold="true"/></textElement><text><![CDATA[Rekomendasi Kegiatan Tambahan:]]></text></staticText>
+				<textField isStretchWithOverflow="true"><reportElement positionType="Float" x="10" y="22" width="515" height="35" forecolor="#212121"/><textElement><font size="8"/></textElement><textFieldExpression><![CDATA[$F{rekomendasi_kegiatan} != null && !$F{rekomendasi_kegiatan}.trim().isEmpty() ? $F{rekomendasi_kegiatan} : "Tidak ada rekomendasi kegiatan."]]></textFieldExpression></textField>
+			</frame>
+		</band>
+	</detail>
+
+	<!-- ═══════════════════════════════════════════════════════════ -->
+	<!-- ██  PAGE FOOTER – TANDA TANGAN & FOOTER                   ██ -->
+	<!-- ═══════════════════════════════════════════════════════════ -->
+	<pageFooter>
+		<band height="130">
+			<!-- Date -->
+			<textField><reportElement x="330" y="5" width="205" height="16"/><textElement textAlignment="Center"><font size="9"/></textElement><textFieldExpression><![CDATA["Contoh Kota, " + new java.text.SimpleDateFormat("dd MMMM yyyy", new java.util.Locale("id", "ID")).format(new java.util.Date())]]></textFieldExpression></textField>
+
+			<!-- Siswa -->
+			<staticText><reportElement x="180" y="22" width="150" height="16"/><textElement textAlignment="Center"><font isBold="true" size="9"/></textElement><text><![CDATA[Siswa Bersangkutan]]></text></staticText>
+			<textField><reportElement x="180" y="75" width="150" height="14"/><textElement textAlignment="Center"><font isBold="true" isUnderline="true" size="9"/></textElement><textFieldExpression><![CDATA[$F{nama} != null ? $F{nama} : "__________________"]]></textFieldExpression></textField>
+			<textField><reportElement x="180" y="89" width="150" height="14"/><textElement textAlignment="Center"><font size="8"/></textElement><textFieldExpression><![CDATA["NIS. " + ($F{nis} != null ? $F{nis} : "________________")]]></textFieldExpression></textField>
+
+			<!-- Konselor -->
+			<staticText><reportElement x="350" y="22" width="185" height="16"/><textElement textAlignment="Center"><font isBold="true" size="9"/></textElement><text><![CDATA[Guru BK / Konselor]]></text></staticText>
+			<textField><reportElement x="350" y="75" width="185" height="14"/><textElement textAlignment="Center"><font isBold="true" isUnderline="true" size="9"/></textElement><textFieldExpression><![CDATA[$F{nama_konselor} != null ? $F{nama_konselor} : "__________________"]]></textFieldExpression></textField>
+			<textField><reportElement x="350" y="89" width="185" height="14"/><textElement textAlignment="Center"><font size="8"/></textElement><textFieldExpression><![CDATA["NIP. " + ($F{nip_konselor} != null ? $F{nip_konselor} : "________________")]]></textFieldExpression></textField>
+
+			<!-- Footer text -->
+			<staticText><reportElement x="0" y="105" width="300" height="12" forecolor="#9E9E9E"/><textElement><font size="7" isItalic="true"/></textElement><text><![CDATA[Digenerate oleh Sistem Pakar Rekomendasi Jurusan v1.0]]></text></staticText>
+
+			<!-- Bottom decorative bars -->
+			<rectangle><reportElement x="0" y="120" width="400" height="3" backcolor="#1A237E" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+			<rectangle><reportElement x="400" y="120" width="135" height="3" backcolor="#FFB300" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+		</band>
+	</pageFooter>
+</jasperReport>
