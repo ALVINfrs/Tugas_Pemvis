@@ -270,4 +270,18 @@
 			</textField>
 		</band>
 	</pageFooter>
+	<lastPageFooter>
+		<band height="100">
+			<!-- Date -->
+			<textField><reportElement x="550" y="0" width="250" height="16" uuid="c1d2e3f4-a5b6-7890-cdef-012345678901"/><textElement textAlignment="Right"><font size="9"/></textElement><textFieldExpression><![CDATA["Contoh Kota, " + new java.text.SimpleDateFormat("dd MMMM yyyy", new java.util.Locale("id", "ID")).format(new java.util.Date())]]></textFieldExpression></textField>
+
+			<!-- Guru BK Signature -->
+			<staticText><reportElement x="550" y="18" width="250" height="14" uuid="c1d2e3f4-a5b6-7890-cdef-012345678902"/><textElement textAlignment="Center"><font size="9"/></textElement><text><![CDATA[Mengetahui,]]></text></staticText>
+			<staticText><reportElement x="550" y="32" width="250" height="14" uuid="c1d2e3f4-a5b6-7890-cdef-012345678903"/><textElement textAlignment="Center"><font size="9" isBold="true"/></textElement><text><![CDATA[Guru BK / Konselor]]></text></staticText>
+			<staticText><reportElement x="550" y="72" width="250" height="14" uuid="c1d2e3f4-a5b6-7890-cdef-012345678904"/><textElement textAlignment="Center"><font size="9" isBold="true" isUnderline="true"/></textElement><text><![CDATA[(_________________)]]></text></staticText>
+
+			<!-- Footer text -->
+			<staticText><reportElement x="0" y="88" width="350" height="12" forecolor="#9E9E9E" uuid="c1d2e3f4-a5b6-7890-cdef-012345678905"/><textElement><font size="7" isItalic="true"/></textElement><text><![CDATA[Digenerate oleh Sistem Pakar Rekomendasi Jurusan v1.0]]></text></staticText>
+		</band>
+	</lastPageFooter>
 </jasperReport>

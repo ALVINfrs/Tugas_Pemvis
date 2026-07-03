@@ -229,6 +229,7 @@
 
 	<!-- ─────────── BAND 2A: CHART MINAT & BAKAT (BAR) ─────────── -->
 		<band height="400" splitType="Stretch">
+			<break><reportElement x="0" y="0" width="535" height="1" uuid="f1b2c3d4-e5f6-7890-abcd-ef0123456780"/></break>
 			<!-- ▌ SECTION III: HASIL ASESMEN MINAT & BAKAT ▌ -->
 			<rectangle><reportElement x="0" y="5" width="535" height="22" backcolor="#1A237E" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
 			<staticText><reportElement x="10" y="5" width="525" height="22" forecolor="#FFFFFF"/><textElement verticalAlignment="Middle"><font size="11" isBold="true"/></textElement><text><![CDATA[III. HASIL ASESMEN MINAT & BAKAT]]></text></staticText>
@@ -349,6 +350,7 @@
 
 	<!-- ─────────── BAND 3: REKOMENDASI UTAMA + ALT 1 + PTN ─────────── -->
 		<band height="440" splitType="Stretch">
+			<break><reportElement x="0" y="0" width="535" height="1" uuid="f1b2c3d4-e5f6-7890-abcd-ef0123456781"/></break>
 			<!-- ▌ SECTION IV: STRATEGI PEMILIHAN JURUSAN & TARGET PTN ▌ -->
 			<rectangle><reportElement x="0" y="0" width="535" height="22" backcolor="#1A237E" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
 			<staticText><reportElement x="10" y="0" width="525" height="22" forecolor="#FFFFFF"/><textElement verticalAlignment="Middle"><font size="11" isBold="true"/></textElement><text><![CDATA[IV. STRATEGI PEMILIHAN JURUSAN & TARGET PTN]]></text></staticText>
@@ -387,6 +389,7 @@
 			</componentElement>
 
 			<!-- ★ ALTERNATIF 1 CARD -->
+			<break><reportElement x="0" y="178" width="535" height="1" uuid="f1b2c3d4-e5f6-7890-abcd-ef0123456782"/></break>
 			<frame><reportElement x="0" y="180" width="535" height="65" backcolor="#EEF2F7" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/><leftPen lineWidth="4.0" lineColor="#00897B"/></box>
 				<staticText><reportElement x="10" y="5" width="200" height="14" forecolor="#00897B"/><textElement><font size="9" isBold="true"/></textElement><text><![CDATA[★ ALTERNATIF 1]]></text></staticText>
 				<textField isStretchWithOverflow="true"><reportElement x="10" y="20" width="515" height="16" forecolor="#00897B"/><textElement><font size="11" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{rekomendasi_alt1} != null ? $F{rekomendasi_alt1} : "N/A"]]></textFieldExpression></textField>
@@ -419,6 +422,7 @@
 			</componentElement>
 
 			<!-- ★ ALTERNATIF 2 CARD -->
+			<break><reportElement x="0" y="313" width="535" height="1" uuid="f1b2c3d4-e5f6-7890-abcd-ef0123456783"/></break>
 			<frame><reportElement x="0" y="315" width="535" height="50" backcolor="#EEF2F7" mode="Opaque"/><box><pen lineWidth="0.5" lineColor="#CCCCCC"/><leftPen lineWidth="4.0" lineColor="#EF6C00"/></box>
 				<staticText><reportElement x="10" y="5" width="200" height="14" forecolor="#EF6C00"/><textElement><font size="9" isBold="true"/></textElement><text><![CDATA[★ ALTERNATIF 2]]></text></staticText>
 				<textField isStretchWithOverflow="true"><reportElement x="10" y="20" width="515" height="16" forecolor="#EF6C00"/><textElement><font size="11" isBold="true"/></textElement><textFieldExpression><![CDATA[$F{rekomendasi_alt2} != null ? $F{rekomendasi_alt2} : "N/A"]]></textFieldExpression></textField>
@@ -451,6 +455,7 @@
 
 	<!-- ─────────── BAND 4: CATATAN KONSELOR ─────────── -->
 		<band height="280" splitType="Stretch">
+			<break><reportElement x="0" y="0" width="535" height="1" uuid="f1b2c3d4-e5f6-7890-abcd-ef0123456784"/></break>
 			<!-- ▌ SECTION V: CATATAN KONSELOR ▌ -->
 			<rectangle><reportElement x="0" y="5" width="535" height="22" backcolor="#1A237E" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
 			<staticText><reportElement x="10" y="5" width="525" height="22" forecolor="#FFFFFF"/><textElement verticalAlignment="Middle"><font size="11" isBold="true"/></textElement><text><![CDATA[V. CATATAN KONSELOR & STRATEGI UMUM]]></text></staticText>
@@ -476,29 +481,46 @@
 	</detail>
 
 	<!-- ═══════════════════════════════════════════════════════════ -->
-	<!-- ██  PAGE FOOTER – TANDA TANGAN & FOOTER                   ██ -->
+	<!-- ██  PAGE FOOTER – FOOTER SETIAP HALAMAN                   ██ -->
 	<!-- ═══════════════════════════════════════════════════════════ -->
 	<pageFooter>
-		<band height="130">
-			<!-- Date -->
-			<textField><reportElement x="330" y="5" width="205" height="16"/><textElement textAlignment="Center"><font size="9"/></textElement><textFieldExpression><![CDATA["Contoh Kota, " + new java.text.SimpleDateFormat("dd MMMM yyyy", new java.util.Locale("id", "ID")).format(new java.util.Date())]]></textFieldExpression></textField>
-
-			<!-- Siswa -->
-			<staticText><reportElement x="180" y="22" width="150" height="16"/><textElement textAlignment="Center"><font isBold="true" size="9"/></textElement><text><![CDATA[Siswa Bersangkutan]]></text></staticText>
-			<textField><reportElement x="180" y="75" width="150" height="14"/><textElement textAlignment="Center"><font isBold="true" isUnderline="true" size="9"/></textElement><textFieldExpression><![CDATA[$F{nama} != null ? $F{nama} : "__________________"]]></textFieldExpression></textField>
-			<textField><reportElement x="180" y="89" width="150" height="14"/><textElement textAlignment="Center"><font size="8"/></textElement><textFieldExpression><![CDATA["NIS. " + ($F{nis} != null ? $F{nis} : "________________")]]></textFieldExpression></textField>
-
-			<!-- Konselor -->
-			<staticText><reportElement x="350" y="22" width="185" height="16"/><textElement textAlignment="Center"><font isBold="true" size="9"/></textElement><text><![CDATA[Guru BK / Konselor]]></text></staticText>
-			<textField><reportElement x="350" y="75" width="185" height="14"/><textElement textAlignment="Center"><font isBold="true" isUnderline="true" size="9"/></textElement><textFieldExpression><![CDATA[$F{nama_konselor} != null ? $F{nama_konselor} : "__________________"]]></textFieldExpression></textField>
-			<textField><reportElement x="350" y="89" width="185" height="14"/><textElement textAlignment="Center"><font size="8"/></textElement><textFieldExpression><![CDATA["NIP. " + ($F{nip_konselor} != null ? $F{nip_konselor} : "________________")]]></textFieldExpression></textField>
-
+		<band height="30">
 			<!-- Footer text -->
-			<staticText><reportElement x="0" y="105" width="300" height="12" forecolor="#9E9E9E"/><textElement><font size="7" isItalic="true"/></textElement><text><![CDATA[Digenerate oleh Sistem Pakar Rekomendasi Jurusan v1.0]]></text></staticText>
-
+			<staticText><reportElement x="0" y="0" width="300" height="12" forecolor="#9E9E9E" uuid="a1b2c3d4-e5f6-7890-abcd-ef0123456781"/><textElement><font size="7" isItalic="true"/></textElement><text><![CDATA[Digenerate oleh Sistem Pakar Rekomendasi Jurusan v1.0]]></text></staticText>
+			<!-- Page number -->
+			<textField><reportElement x="400" y="0" width="135" height="12" forecolor="#9E9E9E" uuid="a1b2c3d4-e5f6-7890-abcd-ef0123456782"/><textElement textAlignment="Right"><font size="7" isItalic="true"/></textElement><textFieldExpression><![CDATA["Halaman " + $V{PAGE_NUMBER}]]></textFieldExpression></textField>
 			<!-- Bottom decorative bars -->
-			<rectangle><reportElement x="0" y="120" width="400" height="3" backcolor="#1A237E" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
-			<rectangle><reportElement x="400" y="120" width="135" height="3" backcolor="#FFB300" mode="Opaque"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+			<rectangle><reportElement x="0" y="20" width="400" height="3" backcolor="#1A237E" mode="Opaque" uuid="a1b2c3d4-e5f6-7890-abcd-ef0123456783"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+			<rectangle><reportElement x="400" y="20" width="135" height="3" backcolor="#FFB300" mode="Opaque" uuid="a1b2c3d4-e5f6-7890-abcd-ef0123456784"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
 		</band>
 	</pageFooter>
+
+	<!-- ═══════════════════════════════════════════════════════════ -->
+	<!-- ██  LAST PAGE FOOTER – TANDA TANGAN & FOOTER              ██ -->
+	<!-- ═══════════════════════════════════════════════════════════ -->
+	<lastPageFooter>
+		<band height="130">
+			<!-- Date -->
+			<textField><reportElement x="330" y="5" width="205" height="16" uuid="b2c3d4e5-f6a7-8901-bcde-f01234567801"/><textElement textAlignment="Center"><font size="9"/></textElement><textFieldExpression><![CDATA["Contoh Kota, " + new java.text.SimpleDateFormat("dd MMMM yyyy", new java.util.Locale("id", "ID")).format(new java.util.Date())]]></textFieldExpression></textField>
+
+			<!-- Siswa -->
+			<staticText><reportElement x="180" y="22" width="150" height="16" uuid="b2c3d4e5-f6a7-8901-bcde-f01234567802"/><textElement textAlignment="Center"><font isBold="true" size="9"/></textElement><text><![CDATA[Siswa Bersangkutan]]></text></staticText>
+			<textField><reportElement x="180" y="75" width="150" height="14" uuid="b2c3d4e5-f6a7-8901-bcde-f01234567803"/><textElement textAlignment="Center"><font isBold="true" isUnderline="true" size="9"/></textElement><textFieldExpression><![CDATA[$F{nama} != null ? $F{nama} : "__________________"]]></textFieldExpression></textField>
+			<textField><reportElement x="180" y="89" width="150" height="14" uuid="b2c3d4e5-f6a7-8901-bcde-f01234567804"/><textElement textAlignment="Center"><font size="8"/></textElement><textFieldExpression><![CDATA["NIS. " + ($F{nis} != null ? $F{nis} : "________________")]]></textFieldExpression></textField>
+
+			<!-- Konselor -->
+			<staticText><reportElement x="350" y="22" width="185" height="16" uuid="b2c3d4e5-f6a7-8901-bcde-f01234567805"/><textElement textAlignment="Center"><font isBold="true" size="9"/></textElement><text><![CDATA[Guru BK / Konselor]]></text></staticText>
+			<textField><reportElement x="350" y="75" width="185" height="14" uuid="b2c3d4e5-f6a7-8901-bcde-f01234567806"/><textElement textAlignment="Center"><font isBold="true" isUnderline="true" size="9"/></textElement><textFieldExpression><![CDATA[$F{nama_konselor} != null ? $F{nama_konselor} : "__________________"]]></textFieldExpression></textField>
+			<textField><reportElement x="350" y="89" width="185" height="14" uuid="b2c3d4e5-f6a7-8901-bcde-f01234567807"/><textElement textAlignment="Center"><font size="8"/></textElement><textFieldExpression><![CDATA["NIP. " + ($F{nip_konselor} != null ? $F{nip_konselor} : "________________")]]></textFieldExpression></textField>
+
+			<!-- Footer text -->
+			<staticText><reportElement x="0" y="105" width="300" height="12" forecolor="#9E9E9E" uuid="b2c3d4e5-f6a7-8901-bcde-f01234567808"/><textElement><font size="7" isItalic="true"/></textElement><text><![CDATA[Digenerate oleh Sistem Pakar Rekomendasi Jurusan v1.0]]></text></staticText>
+			<!-- Page number -->
+			<textField><reportElement x="400" y="105" width="135" height="12" forecolor="#9E9E9E" uuid="b2c3d4e5-f6a7-8901-bcde-f01234567809"/><textElement textAlignment="Right"><font size="7" isItalic="true"/></textElement><textFieldExpression><![CDATA["Halaman " + $V{PAGE_NUMBER}]]></textFieldExpression></textField>
+
+			<!-- Bottom decorative bars -->
+			<rectangle><reportElement x="0" y="120" width="400" height="3" backcolor="#1A237E" mode="Opaque" uuid="b2c3d4e5-f6a7-8901-bcde-f01234567810"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+			<rectangle><reportElement x="400" y="120" width="135" height="3" backcolor="#FFB300" mode="Opaque" uuid="b2c3d4e5-f6a7-8901-bcde-f01234567811"/><graphicElement><pen lineWidth="0.0"/></graphicElement></rectangle>
+		</band>
+	</lastPageFooter>
 </jasperReport>

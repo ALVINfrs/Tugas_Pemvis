@@ -132,7 +132,45 @@ public class FormLaporan extends JPanel {
                 return;
             }
             int konsId = (int) table.getValueAt(row, 0);
-            generateAndOpenReport(konsId);
+            String namaSiswa = table.getValueAt(row, 2).toString();
+            
+            JFileChooser fc = new JFileChooser();
+            fc.setDialogTitle("Simpan Rapor Siswa (PDF)");
+            fc.setSelectedFile(new java.io.File("Rapor_Siswa_" + namaSiswa.replace(" ", "_") + "_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".pdf"));
+            
+            if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                JDialog loadingDlg = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Memproses...", false);
+                JPanel loadPanel = new JPanel(new BorderLayout(10, 10));
+                loadPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+                loadPanel.add(new JLabel("⏳ Sedang menyiapkan Rapor Siswa (PDF)...", SwingConstants.CENTER), BorderLayout.CENTER);
+                JProgressBar pb = new JProgressBar();
+                pb.setIndeterminate(true);
+                loadPanel.add(pb, BorderLayout.SOUTH);
+                loadingDlg.setContentPane(loadPanel);
+                loadingDlg.setSize(380, 120);
+                loadingDlg.setLocationRelativeTo(this);
+                loadingDlg.setVisible(true);
+                
+                new javax.swing.SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        ReportGenerator.generatePremiumReport(konsId, fc.getSelectedFile().getAbsolutePath());
+                        return null;
+                    }
+                    @Override
+                    protected void done() {
+                        loadingDlg.dispose();
+                        try {
+                            get();
+                            JOptionPane.showMessageDialog(FormLaporan.this, "Rapor Siswa PDF berhasil diterbitkan!\n" + fc.getSelectedFile().getName(), "Ekspor Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                            Desktop.getDesktop().open(fc.getSelectedFile());
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                            JOptionPane.showMessageDialog(FormLaporan.this, "Gagal membuat Rapor Siswa:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }.execute();
+            }
         });
         btnVisualRadar.addActionListener(e -> exportRaporVisual());
         btnAdvancedRep.addActionListener(e -> showAdvancedReportDialog());
@@ -599,6 +637,35 @@ public class FormLaporan extends JPanel {
                 }
                 
                 doc.add(pdfTable);
+                
+                // === TTD GURU BK (Laporan Nilai Akademik = tanggung jawab Guru) ===
+                doc.add(new Paragraph("\n\n"));
+                PdfPTable ttdTable = new PdfPTable(2);
+                ttdTable.setWidthPercentage(100);
+                ttdTable.setWidths(new float[]{6f, 4f});
+                
+                PdfPCell ttdEmptyCell = new PdfPCell(new Phrase(" "));
+                ttdEmptyCell.setBorder(com.itextpdf.text.Rectangle.NO_BORDER);
+                ttdTable.addCell(ttdEmptyCell);
+                
+                com.itextpdf.text.Font ttdFont = FontFactory.getFont(FontFactory.HELVETICA, 10, BaseColor.BLACK);
+                com.itextpdf.text.Font ttdBoldFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.BLACK);
+                
+                Paragraph ttdContent = new Paragraph();
+                ttdContent.setAlignment(Element.ALIGN_CENTER);
+                ttdContent.add(new Phrase("Contoh Kota, " + new SimpleDateFormat("dd MMMM yyyy", new Locale("id", "ID")).format(new Date()) + "\n", ttdFont));
+                ttdContent.add(new Phrase("Mengetahui,\n", ttdFont));
+                ttdContent.add(new Phrase("Guru BK / Konselor\n\n\n\n\n", ttdFont));
+                ttdContent.add(new Phrase("(_________________)\n", ttdBoldFont));
+                ttdContent.add(new Phrase("NIP. ________________", ttdFont));
+                
+                PdfPCell ttdCell = new PdfPCell(ttdContent);
+                ttdCell.setBorder(com.itextpdf.text.Rectangle.NO_BORDER);
+                ttdCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                ttdTable.addCell(ttdCell);
+                
+                doc.add(ttdTable);
+                
                 doc.close();
                 JOptionPane.showMessageDialog(this, "Laporan Nilai Akademik & Profil (PDF) berhasil dibuat.", "Ekspor Berhasil", JOptionPane.INFORMATION_MESSAGE);
                 Desktop.getDesktop().open(fc.getSelectedFile());
@@ -777,6 +844,49 @@ public class FormLaporan extends JPanel {
                 Paragraph desc = new Paragraph("\nGrafik di atas merepresentasikan kecenderungan dominasi minat dan bakat siswa berdasarkan hasil kuesioner sistem pakar. Semakin luas area grafik pada suatu sektor, semakin tinggi kecocokan siswa pada rumpun keilmuan tersebut.", subFont);
                 desc.setAlignment(Element.ALIGN_JUSTIFIED);
                 doc.add(desc);
+
+                // === TTD SISWA + KONSELOR (Rapor Visual = laporan individu siswa) ===
+                // Query nama konselor
+                String namaKonselor = "-";
+                try (ResultSet rsK = DBConnection.executeQuery(
+                    "SELECT c.nama FROM konsultasi k JOIN konselor c ON k.konselor_id = c.id WHERE k.id = ?", konsId)) {
+                    if (rsK.next()) namaKonselor = rsK.getString("nama");
+                } catch (Exception exK) { /* ignore */ }
+                
+                doc.add(new Paragraph("\n\n"));
+                PdfPTable ttdVisual = new PdfPTable(3);
+                ttdVisual.setWidthPercentage(100);
+                
+                com.itextpdf.text.Font ttdVisFont = FontFactory.getFont(FontFactory.HELVETICA, 10, BaseColor.BLACK);
+                com.itextpdf.text.Font ttdVisBold = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.BLACK);
+                
+                // Kolom Siswa
+                Paragraph pSiswa = new Paragraph();
+                pSiswa.setAlignment(Element.ALIGN_CENTER);
+                pSiswa.add(new Phrase("Siswa Bersangkutan,\n\n\n\n\n", ttdVisFont));
+                pSiswa.add(new Phrase(namaSiswa + "\n", ttdVisBold));
+                PdfPCell cSiswa = new PdfPCell(pSiswa);
+                cSiswa.setBorder(com.itextpdf.text.Rectangle.NO_BORDER);
+                cSiswa.setHorizontalAlignment(Element.ALIGN_CENTER);
+                ttdVisual.addCell(cSiswa);
+                
+                // Kolom spacer
+                PdfPCell cSpace = new PdfPCell(new Phrase(" "));
+                cSpace.setBorder(com.itextpdf.text.Rectangle.NO_BORDER);
+                ttdVisual.addCell(cSpace);
+                
+                // Kolom Konselor
+                Paragraph pKons = new Paragraph();
+                pKons.setAlignment(Element.ALIGN_CENTER);
+                pKons.add(new Phrase("Contoh Kota, " + new SimpleDateFormat("dd MMMM yyyy", new Locale("id", "ID")).format(new Date()) + "\n", ttdVisFont));
+                pKons.add(new Phrase("Guru BK / Konselor,\n\n\n\n\n", ttdVisFont));
+                pKons.add(new Phrase(namaKonselor + "\n", ttdVisBold));
+                PdfPCell cKons = new PdfPCell(pKons);
+                cKons.setBorder(com.itextpdf.text.Rectangle.NO_BORDER);
+                cKons.setHorizontalAlignment(Element.ALIGN_CENTER);
+                ttdVisual.addCell(cKons);
+                
+                doc.add(ttdVisual);
 
                 doc.close();
                 JOptionPane.showMessageDialog(this, "Rapor Visual PDF berhasil diterbitkan.", "Ekspor Berhasil", JOptionPane.INFORMATION_MESSAGE);
@@ -1083,6 +1193,32 @@ public class FormLaporan extends JPanel {
                     }
                 }
                 doc.add(pdfTable);
+                
+                // === TTD GURU BK (Laporan Analitik = tanggung jawab Guru/Admin) ===
+                doc.add(new Paragraph("\n\n"));
+                PdfPTable ttdAnalitik = new PdfPTable(2);
+                ttdAnalitik.setWidthPercentage(100);
+                ttdAnalitik.setWidths(new float[]{6f, 4f});
+                
+                PdfPCell ttdAEmpty = new PdfPCell(new Phrase(" "));
+                ttdAEmpty.setBorder(com.itextpdf.text.Rectangle.NO_BORDER);
+                ttdAnalitik.addCell(ttdAEmpty);
+                
+                Paragraph ttdAContent = new Paragraph();
+                ttdAContent.setAlignment(Element.ALIGN_CENTER);
+                ttdAContent.add(new Phrase("Contoh Kota, " + new SimpleDateFormat("dd MMMM yyyy", new Locale("id", "ID")).format(new Date()) + "\n", cellFont));
+                ttdAContent.add(new Phrase("Mengetahui,\n", cellFont));
+                ttdAContent.add(new Phrase("Guru BK / Konselor\n\n\n\n\n", cellFont));
+                ttdAContent.add(new Phrase("(_________________)\n", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8, BaseColor.BLACK)));
+                ttdAContent.add(new Phrase("NIP. ________________", cellFont));
+                
+                PdfPCell ttdACell = new PdfPCell(ttdAContent);
+                ttdACell.setBorder(com.itextpdf.text.Rectangle.NO_BORDER);
+                ttdACell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                ttdAnalitik.addCell(ttdACell);
+                
+                doc.add(ttdAnalitik);
+                
                 doc.close();
 
                 JOptionPane.showMessageDialog(this, "Laporan Analitik PDF berhasil diterbitkan.", "Ekspor Berhasil", JOptionPane.INFORMATION_MESSAGE);
