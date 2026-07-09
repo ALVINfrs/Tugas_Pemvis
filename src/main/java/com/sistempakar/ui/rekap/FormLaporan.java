@@ -41,6 +41,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+
 /**
  * Form Laporan Konsultasi Terpadu (Enterprise Reporting Module).
  * Dilengkapi dengan Visual Analytics, Filter Lanjutan, Export PDF (Konsultasi & Nilai),
@@ -176,7 +189,7 @@ public class FormLaporan extends JPanel {
         btnAdvancedRep.addActionListener(e -> showAdvancedReportDialog());
         btnPdfKonsultasi.addActionListener(e -> exportToPDF("KONSULTASI"));
         btnPdfNilaiProfil.addActionListener(e -> exportNilaiToPDF()); 
-        btnExportCsv.addActionListener(e -> exportToCSV());
+        btnExportCsv.addActionListener(e -> exportToExcel());
         btnPrint.addActionListener(e -> printTable());
 
         // Susun tombol di baris kedua
@@ -677,95 +690,283 @@ public class FormLaporan extends JPanel {
         }
     }
 
-    private void exportToCSV() {
+    private void exportToExcel() {
         JFileChooser fc = new JFileChooser();
-        fc.setSelectedFile(new java.io.File("Rekapitulasi_Konsultasi_Master_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".csv"));
+        fc.setSelectedFile(new java.io.File("Rekapitulasi_Konsultasi_Master_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".xlsx"));
         if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-            try (OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(fc.getSelectedFile()), "UTF-8")) {
-                fw.write("\ufeff"); 
-                String sep = ";"; 
-                
-                fw.write("SMAN 1 CONTOH KOTA - REKAPITULASI KONSULTASI LENGKAP\n");
-                fw.write("Tanggal Cetak:" + sep + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date()) + "\n");
-                fw.write("Filter Kelas:" + sep + cbKelas.getSelectedItem() + "\n");
-                fw.write("Filter Status:" + sep + cbStatus.getSelectedItem() + "\n");
-                fw.write("Total Data:" + sep + model.getRowCount() + "\n\n");
-                
-                fw.write("No Konsultasi" + sep + "Tanggal" + sep + "NIS" + sep + "Nama Siswa" + sep + "Kelas" + sep + "Jurusan SMA" + sep + "Konselor/Guru BK" + sep +
-                         "Skor Teknologi" + sep + "Skor Sains" + sep + "Skor Sosial" + sep + "Skor Seni" + sep + "Skor Bisnis" + sep + "Skor Bahasa" + sep + "Skor Kesehatan" + sep +
-                         "Rekomendasi Utama" + sep + "Alternatif 1" + sep + "Alternatif 2" + sep + "Status\n");
-                
-                String search = tfSearch.getText().trim();
-                String status = cbStatus.getSelectedItem().toString();
-                String kelas = cbKelas.getSelectedItem().toString();
-                
-                StringBuilder sb = new StringBuilder(
-                    "SELECT k.no_konsultasi, k.tanggal_konsultasi, s.nis, s.nama as siswa, s.kelas, s.jurusan_sma, c.nama as konselor, " +
-                    "k.skor_teknologi, k.skor_sains, k.skor_sosial, k.skor_seni, k.skor_bisnis, k.skor_bahasa, k.skor_kesehatan, " +
-                    "j1.nama as rek1, j2.nama as rek2, j3.nama as rek3, k.status " +
-                    "FROM konsultasi k " +
-                    "JOIN siswa s ON k.siswa_id = s.id " +
-                    "JOIN konselor c ON k.konselor_id = c.id " +
-                    "LEFT JOIN jurusan_kuliah j1 ON k.rekomendasi_utama_id = j1.id " +
-                    "LEFT JOIN jurusan_kuliah j2 ON k.rekomendasi_alt1_id = j2.id " +
-                    "LEFT JOIN jurusan_kuliah j3 ON k.rekomendasi_alt2_id = j3.id " +
-                    "WHERE 1=1 "
-                );
-                
-                if (!search.isEmpty()) sb.append("AND (k.no_konsultasi LIKE '%").append(search).append("%' OR s.nama LIKE '%").append(search).append("%') ");
-                if (!status.equals("Semua Status")) sb.append("AND k.status = '").append(status.toLowerCase().replace(" ", "_")).append("' ");
-                if (!kelas.equals("Semua Kelas")) sb.append("AND s.kelas = '").append(kelas).append("' ");
-                sb.append("ORDER BY k.tanggal_konsultasi DESC");
-                
-                ResultSet rs = DBConnection.executeQuery(sb.toString());
-                int count = 0;
-                long sumTekno=0, sumSains=0, sumSosial=0, sumSeni=0, sumBisnis=0, sumBahasa=0, sumKes=0;
-                
-                while(rs.next()) {
-                    fw.write(
-                        "\"" + rs.getString("no_konsultasi") + "\"" + sep +
-                        "\"" + (rs.getTimestamp("tanggal_konsultasi") != null ? new SimpleDateFormat("dd/MM/yyyy").format(rs.getTimestamp("tanggal_konsultasi")) : "") + "\"" + sep +
-                        "\"" + rs.getString("nis") + "\"" + sep +
-                        "\"" + rs.getString("siswa") + "\"" + sep +
-                        "\"" + rs.getString("kelas") + "\"" + sep +
-                        "\"" + rs.getString("jurusan_sma") + "\"" + sep +
-                        "\"" + rs.getString("konselor") + "\"" + sep +
-                        rs.getInt("skor_teknologi") + sep +
-                        rs.getInt("skor_sains") + sep +
-                        rs.getInt("skor_sosial") + sep +
-                        rs.getInt("skor_seni") + sep +
-                        rs.getInt("skor_bisnis") + sep +
-                        rs.getInt("skor_bahasa") + sep +
-                        rs.getInt("skor_kesehatan") + sep +
-                        "\"" + (rs.getString("rek1") != null ? rs.getString("rek1") : "") + "\"" + sep +
-                        "\"" + (rs.getString("rek2") != null ? rs.getString("rek2") : "") + "\"" + sep +
-                        "\"" + (rs.getString("rek3") != null ? rs.getString("rek3") : "") + "\"" + sep +
-                        "\"" + rs.getString("status").toUpperCase().replace("_", " ") + "\"\n"
-                    );
-                    sumTekno += rs.getInt("skor_teknologi");
-                    sumSains += rs.getInt("skor_sains");
-                    sumSosial += rs.getInt("skor_sosial");
-                    sumSeni += rs.getInt("skor_seni");
-                    sumBisnis += rs.getInt("skor_bisnis");
-                    sumBahasa += rs.getInt("skor_bahasa");
-                    sumKes += rs.getInt("skor_kesehatan");
-                    count++;
+            
+            // Show loading dialog
+            JDialog loadingDlg = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Mengekspor...", false);
+            JPanel loadPanel = new JPanel(new BorderLayout(10, 10));
+            loadPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+            loadPanel.add(new JLabel("⏳ Sedang membuat file Excel...", SwingConstants.CENTER), BorderLayout.CENTER);
+            JProgressBar pb = new JProgressBar();
+            pb.setIndeterminate(true);
+            loadPanel.add(pb, BorderLayout.SOUTH);
+            loadingDlg.setContentPane(loadPanel);
+            loadingDlg.setSize(300, 120);
+            loadingDlg.setLocationRelativeTo(this);
+            loadingDlg.setVisible(true);
+
+            new javax.swing.SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    try (Workbook workbook = new XSSFWorkbook()) {
+                        Sheet sheet = workbook.createSheet("Rekapitulasi Konsultasi");
+
+                        // Styles
+                        CellStyle titleStyle = workbook.createCellStyle();
+                        org.apache.poi.ss.usermodel.Font titleFont = workbook.createFont();
+                        titleFont.setBold(true);
+                        titleFont.setFontHeightInPoints((short) 14);
+                        titleStyle.setFont(titleFont);
+                        titleStyle.setAlignment(HorizontalAlignment.CENTER);
+
+                        CellStyle metaStyle = workbook.createCellStyle();
+                        org.apache.poi.ss.usermodel.Font metaFont = workbook.createFont();
+                        metaFont.setBold(true);
+                        metaStyle.setFont(metaFont);
+
+                        CellStyle headerStyle = workbook.createCellStyle();
+                        org.apache.poi.ss.usermodel.Font headerFont = workbook.createFont();
+                        headerFont.setBold(true);
+                        headerFont.setColor(IndexedColors.WHITE.getIndex());
+                        headerStyle.setFont(headerFont);
+                        headerStyle.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
+                        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+                        headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+                        headerStyle.setBorderTop(BorderStyle.THIN);
+                        headerStyle.setBorderBottom(BorderStyle.THIN);
+                        headerStyle.setBorderLeft(BorderStyle.THIN);
+                        headerStyle.setBorderRight(BorderStyle.THIN);
+                        headerStyle.setWrapText(true);
+
+                        CellStyle dataStyle = workbook.createCellStyle();
+                        dataStyle.setBorderTop(BorderStyle.THIN);
+                        dataStyle.setBorderBottom(BorderStyle.THIN);
+                        dataStyle.setBorderLeft(BorderStyle.THIN);
+                        dataStyle.setBorderRight(BorderStyle.THIN);
+                        dataStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+                        CellStyle ttdStyle = workbook.createCellStyle();
+                        ttdStyle.setAlignment(HorizontalAlignment.CENTER);
+                        org.apache.poi.ss.usermodel.Font ttdFont = workbook.createFont();
+                        ttdFont.setFontHeightInPoints((short) 11);
+                        ttdStyle.setFont(ttdFont);
+                        
+                        CellStyle ttdBoldStyle = workbook.createCellStyle();
+                        ttdBoldStyle.setAlignment(HorizontalAlignment.CENTER);
+                        org.apache.poi.ss.usermodel.Font ttdBoldFont = workbook.createFont();
+                        ttdBoldFont.setBold(true);
+                        ttdBoldFont.setUnderline(org.apache.poi.ss.usermodel.Font.U_SINGLE);
+                        ttdBoldFont.setFontHeightInPoints((short) 11);
+                        ttdBoldStyle.setFont(ttdBoldFont);
+
+                        // Title
+                        Row rowTitle = sheet.createRow(0);
+                        Cell cellTitle = rowTitle.createCell(0);
+                        cellTitle.setCellValue("SMAN 1 CONTOH KOTA - REKAPITULASI KONSULTASI LENGKAP");
+                        cellTitle.setCellStyle(titleStyle);
+                        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 17));
+
+                        // Meta Info
+                        Row rDate = sheet.createRow(2);
+                        rDate.createCell(0).setCellValue("Tanggal Cetak:"); rDate.createCell(1).setCellValue(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date()));
+                        Row rKelas = sheet.createRow(3);
+                        rKelas.createCell(0).setCellValue("Filter Kelas:"); rKelas.createCell(1).setCellValue(cbKelas.getSelectedItem().toString());
+                        Row rStatus = sheet.createRow(4);
+                        rStatus.createCell(0).setCellValue("Filter Status:"); rStatus.createCell(1).setCellValue(cbStatus.getSelectedItem().toString());
+                        Row rTotal = sheet.createRow(5);
+                        rTotal.createCell(0).setCellValue("Total Data:"); rTotal.createCell(1).setCellValue(model.getRowCount());
+                        
+                        rDate.getCell(0).setCellStyle(metaStyle); rKelas.getCell(0).setCellStyle(metaStyle);
+                        rStatus.getCell(0).setCellStyle(metaStyle); rTotal.getCell(0).setCellStyle(metaStyle);
+
+                        // Headers
+                        String[] headers = {
+                            "No Konsultasi", "Tanggal", "NIS", "Nama Siswa", "Kelas", "Jurusan SMA", "Konselor/Guru BK",
+                            "Skor\nTeknologi", "Skor\nSains", "Skor\nSosial", "Skor\nSeni", "Skor\nBisnis", "Skor\nBahasa", "Skor\nKesehatan",
+                            "Rekomendasi Utama", "Alternatif 1", "Alternatif 2", "Status"
+                        };
+                        
+                        Row headerRow = sheet.createRow(7);
+                        headerRow.setHeightInPoints(30);
+                        for (int i = 0; i < headers.length; i++) {
+                            Cell cell = headerRow.createCell(i);
+                            cell.setCellValue(headers[i]);
+                            cell.setCellStyle(headerStyle);
+                        }
+
+                        // Data fetching
+                        String search = tfSearch.getText().trim();
+                        String status = cbStatus.getSelectedItem().toString();
+                        String kelas = cbKelas.getSelectedItem().toString();
+                        
+                        StringBuilder sb = new StringBuilder(
+                            "SELECT k.no_konsultasi, k.tanggal_konsultasi, s.nis, s.nama as siswa, s.kelas, s.jurusan_sma, c.nama as konselor, " +
+                            "k.skor_teknologi, k.skor_sains, k.skor_sosial, k.skor_seni, k.skor_bisnis, k.skor_bahasa, k.skor_kesehatan, " +
+                            "j1.nama as rek1, j2.nama as rek2, j3.nama as rek3, k.status " +
+                            "FROM konsultasi k " +
+                            "JOIN siswa s ON k.siswa_id = s.id " +
+                            "JOIN konselor c ON k.konselor_id = c.id " +
+                            "LEFT JOIN jurusan_kuliah j1 ON k.rekomendasi_utama_id = j1.id " +
+                            "LEFT JOIN jurusan_kuliah j2 ON k.rekomendasi_alt1_id = j2.id " +
+                            "LEFT JOIN jurusan_kuliah j3 ON k.rekomendasi_alt2_id = j3.id " +
+                            "WHERE 1=1 "
+                        );
+                        
+                        if (!search.isEmpty()) sb.append("AND (k.no_konsultasi LIKE '%").append(search).append("%' OR s.nama LIKE '%").append(search).append("%') ");
+                        if (!status.equals("Semua Status")) sb.append("AND k.status = '").append(status.toLowerCase().replace(" ", "_")).append("' ");
+                        if (!kelas.equals("Semua Kelas")) sb.append("AND s.kelas = '").append(kelas).append("' ");
+                        sb.append("ORDER BY k.tanggal_konsultasi DESC");
+                        
+                        ResultSet rs = DBConnection.executeQuery(sb.toString());
+                        int rowNum = 8;
+                        int count = 0;
+                        long sumTekno=0, sumSains=0, sumSosial=0, sumSeni=0, sumBisnis=0, sumBahasa=0, sumKes=0;
+                        
+                        while(rs.next()) {
+                            Row row = sheet.createRow(rowNum++);
+                            
+                            Object[] values = {
+                                rs.getString("no_konsultasi"),
+                                rs.getTimestamp("tanggal_konsultasi") != null ? new SimpleDateFormat("dd/MM/yyyy").format(rs.getTimestamp("tanggal_konsultasi")) : "",
+                                rs.getString("nis"), rs.getString("siswa"), rs.getString("kelas"), rs.getString("jurusan_sma"), rs.getString("konselor"),
+                                rs.getInt("skor_teknologi"), rs.getInt("skor_sains"), rs.getInt("skor_sosial"), rs.getInt("skor_seni"),
+                                rs.getInt("skor_bisnis"), rs.getInt("skor_bahasa"), rs.getInt("skor_kesehatan"),
+                                rs.getString("rek1") != null ? rs.getString("rek1") : "-",
+                                rs.getString("rek2") != null ? rs.getString("rek2") : "-",
+                                rs.getString("rek3") != null ? rs.getString("rek3") : "-",
+                                rs.getString("status").toUpperCase().replace("_", " ")
+                            };
+                            
+                            for (int i = 0; i < values.length; i++) {
+                                Cell cell = row.createCell(i);
+                                if (values[i] instanceof Number) {
+                                    cell.setCellValue(((Number) values[i]).doubleValue());
+                                } else {
+                                    cell.setCellValue(values[i] != null ? values[i].toString() : "");
+                                }
+                                cell.setCellStyle(dataStyle);
+                            }
+                            
+                            sumTekno += rs.getInt("skor_teknologi");
+                            sumSains += rs.getInt("skor_sains");
+                            sumSosial += rs.getInt("skor_sosial");
+                            sumSeni += rs.getInt("skor_seni");
+                            sumBisnis += rs.getInt("skor_bisnis");
+                            sumBahasa += rs.getInt("skor_bahasa");
+                            sumKes += rs.getInt("skor_kesehatan");
+                            count++;
+                        }
+                        
+                        // Rata-rata
+                        if (count > 0) {
+                            Row rowAvg = sheet.createRow(rowNum++);
+                            for(int i=0; i<=6; i++) {
+                                Cell c = rowAvg.createCell(i);
+                                c.setCellStyle(dataStyle);
+                                if(i == 6) { c.setCellValue("RATA-RATA:"); c.setCellStyle(headerStyle); }
+                            }
+                            double[] avgs = { (double)sumTekno/count, (double)sumSains/count, (double)sumSosial/count, (double)sumSeni/count, (double)sumBisnis/count, (double)sumBahasa/count, (double)sumKes/count };
+                            for(int i=0; i<avgs.length; i++) {
+                                Cell c = rowAvg.createCell(7+i);
+                                c.setCellValue(Math.round(avgs[i] * 10.0) / 10.0);
+                                c.setCellStyle(dataStyle);
+                            }
+                            for(int i=14; i<18; i++) { rowAvg.createCell(i).setCellStyle(dataStyle); }
+                        }
+                        
+                        rs.getStatement().close();
+                        
+                        // Auto-size columns
+                        for (int i = 0; i < headers.length; i++) {
+                            sheet.autoSizeColumn(i);
+                        }
+
+                        // === TANDA TANGAN SECTION ===
+                        rowNum += 3;
+                        
+                        Row rowTtdDate = sheet.createRow(rowNum);
+                        Cell cellDate = rowTtdDate.createCell(14);
+                        cellDate.setCellValue("Contoh Kota, " + new SimpleDateFormat("dd MMMM yyyy", new Locale("id", "ID")).format(new Date()));
+                        cellDate.setCellStyle(ttdStyle);
+                        sheet.addMergedRegion(new CellRangeAddress(rowNum, rowNum, 14, 16));
+                        
+                        rowNum++;
+                        Row rowTtdTitle = sheet.createRow(rowNum);
+                        
+                        Cell cellTitleKS = rowTtdTitle.createCell(2);
+                        cellTitleKS.setCellValue("Mengetahui,");
+                        cellTitleKS.setCellStyle(ttdStyle);
+                        sheet.addMergedRegion(new CellRangeAddress(rowNum, rowNum, 2, 4));
+                        
+                        Cell cellTitleGBK = rowTtdTitle.createCell(14);
+                        cellTitleGBK.setCellValue("Mengetahui,");
+                        cellTitleGBK.setCellStyle(ttdStyle);
+                        sheet.addMergedRegion(new CellRangeAddress(rowNum, rowNum, 14, 16));
+                        
+                        rowNum++;
+                        Row rowTtdJabatan = sheet.createRow(rowNum);
+                        
+                        Cell cellJabKS = rowTtdJabatan.createCell(2);
+                        cellJabKS.setCellValue("Kepala Sekolah");
+                        cellJabKS.setCellStyle(ttdStyle);
+                        sheet.addMergedRegion(new CellRangeAddress(rowNum, rowNum, 2, 4));
+                        
+                        Cell cellJabGBK = rowTtdJabatan.createCell(14);
+                        cellJabGBK.setCellValue("Guru BK / Konselor");
+                        cellJabGBK.setCellStyle(ttdStyle);
+                        sheet.addMergedRegion(new CellRangeAddress(rowNum, rowNum, 14, 16));
+                        
+                        rowNum += 4;
+                        Row rowTtdName = sheet.createRow(rowNum);
+                        
+                        Cell cellNameKS = rowTtdName.createCell(2);
+                        cellNameKS.setCellValue("Dr. H. Ahmad Sudirman, M.Pd");
+                        cellNameKS.setCellStyle(ttdBoldStyle);
+                        sheet.addMergedRegion(new CellRangeAddress(rowNum, rowNum, 2, 4));
+                        
+                        Cell cellNameGBK = rowTtdName.createCell(14);
+                        cellNameGBK.setCellValue("Siti Aminah, S.Psi");
+                        cellNameGBK.setCellStyle(ttdBoldStyle);
+                        sheet.addMergedRegion(new CellRangeAddress(rowNum, rowNum, 14, 16));
+                        
+                        rowNum++;
+                        Row rowTtdNip = sheet.createRow(rowNum);
+                        
+                        Cell cellNipKS = rowTtdNip.createCell(2);
+                        cellNipKS.setCellValue("NIP. 19700101 199512 1 001");
+                        cellNipKS.setCellStyle(ttdStyle);
+                        sheet.addMergedRegion(new CellRangeAddress(rowNum, rowNum, 2, 4));
+                        
+                        Cell cellNipGBK = rowTtdNip.createCell(14);
+                        cellNipGBK.setCellValue("NIP. 19850515 201001 2 005");
+                        cellNipGBK.setCellStyle(ttdStyle);
+                        sheet.addMergedRegion(new CellRangeAddress(rowNum, rowNum, 14, 16));
+                        // ============================
+
+                        try (FileOutputStream fileOut = new FileOutputStream(fc.getSelectedFile())) {
+                            workbook.write(fileOut);
+                        }
+                    }
+                    return null;
                 }
                 
-                if(count > 0) {
-                    fw.write(sep + sep + sep + sep + sep + sep + "RATA-RATA:" + sep + 
-                        (sumTekno/count) + sep + (sumSains/count) + sep + (sumSosial/count) + sep +
-                        (sumSeni/count) + sep + (sumBisnis/count) + sep + (sumBahasa/count) + sep +
-                        (sumKes/count) + sep + sep + sep + "\n");
+                @Override
+                protected void done() {
+                    loadingDlg.dispose();
+                    try {
+                        get();
+                        JOptionPane.showMessageDialog(FormLaporan.this, "Data berhasil diekspor ke format Excel (.xlsx) dengan rapi.", "Ekspor Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                        Desktop.getDesktop().open(fc.getSelectedFile());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(FormLaporan.this, "Gagal melakukan ekspor: " + ex.getMessage(), "Kesalahan Ekspor", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
-                
-                rs.getStatement().close();
-                JOptionPane.showMessageDialog(this, "Data berhasil diekspor ke Excel (CSV) secara rapi.", "Ekspor Berhasil", JOptionPane.INFORMATION_MESSAGE);
-                Desktop.getDesktop().open(fc.getSelectedFile());
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Gagal melakukan ekspor: " + e.getMessage(), "Kesalahan Ekspor", JOptionPane.ERROR_MESSAGE);
-                e.printStackTrace();
-            }
+            }.execute();
         }
     }
 
